@@ -1,0 +1,27 @@
+# ─── Credenciales y datos sensibles ───────────────────────────────────────────
+.env
+.env.local
+.env.production
+
+# ─── Archivos de Office generados ─────────────────────────────────────────────
+# Descomenta la siguiente línea si NO quieres versionar el template
+# *.xlsx
+# *.xls
+
+# Sí excluir cotizaciones generadas (output del workflow)
+output/
+generated/
+cotizaciones/
+
+# ─── PDFs generados ───────────────────────────────────────────────────────────
+*.pdf
+
+# ─── Node / runtime ───────────────────────────────────────────────────────────
+node_modules/
+dist/
+.cache/
+
+# ─── OS / IDE ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/settings.json

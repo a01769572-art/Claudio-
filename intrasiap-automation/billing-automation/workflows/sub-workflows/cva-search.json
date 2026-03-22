@@ -1,0 +1,22 @@
+{
+  "name": "Cotización Intrasiap — CVA Search",
+  "nodes": [
+    { "id": "cva-001", "name": "Trigger",      "type": "n8n-nodes-base.executeWorkflowTrigger", "typeVersion": 1, "position": [220,300], "parameters": {} },
+    { "id": "cva-002", "name": "Parsear Input","type": "n8n-nodes-base.code", "typeVersion": 2, "position": [440,300],
+      "parameters": { "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];" } },
+    {
+      "id": "cva-003", "name": "Buscar en CVA (REST)", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [660,300],
+      "parameters": {
+        "jsCode": "// CVA SOAP endpoint — búsqueda via REST alternativo (si disponible)\n// o via el endpoint SOAP de CVA\nconst productos=$('Parsear Input').first().json.productos||[];\nconst usuario=$vars.CVA_USUARIO;\nconst password=$vars.CVA_PASSWORD;\nconst allResults=[];\n\nfor(const p of productos){\n  try{\n    // CVA REST endpoint (documentación: grupocva.com/api/docs)\n    const resp=await $helpers.httpRequest({\n      method:'GET',\n      url:'https://www.grupocva.com/api/v1/productos/buscar',\n      headers:{'Content-Type':'application/json'},\n      qs:{usuario,password,q:p.searchQuery,limite:5}\n    });\n    const items=resp.productos||resp.data||[];\n    for(const item of (Array.isArray(items)?items:[]).slice(0,3)){\n      allResults.push({mayorista:'CVA',sku:item.clave||item.codigo||'',skuFabricante:item.numero_parte||'',descripcion:item.descripcion||item.nombre||'',marca:item.marca||p.marca,precio:Number(item.precio||0),moneda:'MXN',existencia:Number(item.existencia||0),disponible:(item.existencia||0)>0,imagenUrl:item.imagen||'',productoBuscado:p.searchQuery});\n    }\n  }catch(e){allResults.push({mayorista:'CVA',error:e.message,productoBuscado:p.searchQuery});}\n}\nreturn allResults.map(r=>({json:r}));"
+      }
+    },
+    { "id": "cva-004", "name": "Normalizar Respuesta", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [880,300],
+      "parameters": { "jsCode": "const items=$input.all();return [{json:{mayorista:'CVA',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];" } }
+  ],
+  "connections": {
+    "Trigger":             {"main":[[{"node":"Parsear Input","type":"main","index":0}]]},
+    "Parsear Input":       {"main":[[{"node":"Buscar en CVA (REST)","type":"main","index":0}]]},
+    "Buscar en CVA (REST)":{"main":[[{"node":"Normalizar Respuesta","type":"main","index":0}]]}
+  },
+  "active": false, "settings": {"executionOrder":"v1"}
+}

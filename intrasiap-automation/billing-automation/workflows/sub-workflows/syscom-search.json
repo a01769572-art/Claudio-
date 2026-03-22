@@ -1,0 +1,72 @@
+{
+  "name": "Cotización Intrasiap — SYSCOM Search",
+  "nodes": [
+    {
+      "id": "syscom-001-trigger",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [220, 300],
+      "parameters": {}
+    },
+    {
+      "id": "syscom-002-parse",
+      "name": "Parsear Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300],
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.data || '{}';\nconst data = typeof raw === 'string' ? JSON.parse(raw) : raw;\nreturn [{ json: data }];"
+      }
+    },
+    {
+      "id": "syscom-003-token",
+      "name": "Obtener Token SYSCOM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://developers.syscom.mx/oauth/token",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "grant_type",    "value": "client_credentials" },
+            { "name": "client_id",     "value": "={{ $vars.SYSCOM_CLIENT_ID }}" },
+            { "name": "client_secret", "value": "={{ $vars.SYSCOM_CLIENT_SECRET }}" }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "syscom-004-search",
+      "name": "Buscar en SYSCOM",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 300],
+      "parameters": {
+        "jsCode": "const token     = $('Obtener Token SYSCOM').first().json.access_token;\nconst productos = $('Parsear Input').first().json.productos || [];\nconst allResults = [];\n\nfor (const producto of productos) {\n  try {\n    const resp = await $helpers.httpRequest({\n      method: 'GET',\n      url: 'https://developers.syscom.mx/api/v1/productos',\n      headers: { Authorization: `Bearer ${token}` },\n      qs: { keyword: producto.searchQuery, limite: 5 }\n    });\n\n    const items = resp.productos || resp.data || resp || [];\n    const list  = Array.isArray(items) ? items : [];\n\n    for (const item of list.slice(0, 3)) {\n      allResults.push({\n        mayorista:       'SYSCOM',\n        sku:             item.producto_id || item.codigo || '',\n        skuFabricante:   item.numero_parte || '',\n        descripcion:     item.titulo || item.descripcion || '',\n        marca:           item.marca || producto.marca,\n        precio:          Number(item.precios?.precio_lista || item.precio || 0),\n        moneda:          'MXN',\n        existencia:      Number(item.total_existencia || item.existencia || 0),\n        disponible:      (item.total_existencia || 0) > 0,\n        imagenUrl:       item.img_portada || '',\n        productoBuscado: producto.searchQuery\n      });\n    }\n  } catch(e) {\n    allResults.push({ mayorista: 'SYSCOM', error: e.message, productoBuscado: producto.searchQuery });\n  }\n}\n\nreturn allResults.map(r => ({ json: r }));"
+      }
+    },
+    {
+      "id": "syscom-005-normalize",
+      "name": "Normalizar Respuesta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 300],
+      "parameters": {
+        "jsCode": "const items = $input.all();\nreturn [{ json: { mayorista: 'SYSCOM', exitoso: true, resultados: items.map(i=>i.json).filter(r=>!r.error && r.precio>0), timestamp: new Date().toISOString() } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger":              { "main": [[ { "node": "Parsear Input",         "type": "main", "index": 0 } ]] },
+    "Parsear Input":        { "main": [[ { "node": "Obtener Token SYSCOM",  "type": "main", "index": 0 } ]] },
+    "Obtener Token SYSCOM": { "main": [[ { "node": "Buscar en SYSCOM",      "type": "main", "index": 0 } ]] },
+    "Buscar en SYSCOM":     { "main": [[ { "node": "Normalizar Respuesta",  "type": "main", "index": 0 } ]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" }
+}

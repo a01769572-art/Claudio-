@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Definitiva de n8n para Directores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --n8n-main: #EA4B71;
+            --n8n-dark: #2F3349;
+            --n8n-light: #F7F7F8;
+            --n8n-accent: #3A4EE0;
+            --n8n-success: #1EC997;
+            --n8n-warning: #FFB822;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--n8n-light);
+            color: var(--n8n-dark);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background: var(--n8n-dark);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 6px solid var(--n8n-main);
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            color: #A0A5B9;
+            max-width: 600px;
+            margin: 15px auto 0;
+        }
+
+        .wrapper {
+            max-width: 1000px;
+            margin: -30px auto 40px;
+            padding: 0 20px;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border-left: 5px solid var(--n8n-accent);
+        }
+
+        .section-card h2 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--n8n-dark);
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--n8n-light);
+            padding-bottom: 15px;
+        }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .concept-box {
+            background: var(--n8n-light);
+            border: 1px solid #E4E5EB;
+            padding: 25px;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+
+        .concept-box:hover {
+            transform: translateY(-3px);
+            border-color: var(--n8n-accent);
+        }
+
+        .concept-box h3 {
+            color: var(--n8n-main);
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+
+        .json-example {
+            background: #1E1E1E;
+            color: #D4D4D4;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .n8n-green {
+            color: var(--n8n-success);
+        }
+
+        .n8n-yellow {
+            color: var(--n8n-warning);
+        }
+
+        .communication-box {
+            background: rgba(58, 78, 224, 0.05);
+            border: 2px dashed var(--n8n-accent);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .communication-box strong {
+            color: var(--n8n-accent);
+        }
+
+        /* Node Types Badges */
+        .node-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .bg-trigger {
+            background: var(--n8n-main);
+        }
+
+        .bg-logic {
+            background: var(--n8n-accent);
+        }
+
+        .bg-action {
+            background: var(--n8n-success);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>Anatomía de n8n explicada al Director</h1>
+        <p>Aprende de forma intuitiva cómo "piensa" n8n para que puedas dictarle arquitecturas exactas y robustas a
+            Claudio.</p>
+    </header>
+
+    <div class="wrapper">
+
+        <!-- SECCIÓN 1: La Lógica Fundamental -->
+        <div class="section-card" style="border-left-color: var(--n8n-main);">
+            <h2>1. El ADN de n8n: Items (JSON) 📦</h2>
+            <p>El concepto más importante de n8n es este: <strong>TODOS los nodos se comunican pasando cajas de
+                    información llamadas "Items"</strong>, las cuales están escritas siempre en formato
+                <strong>JSON</strong> (pares de Nombre y Valor).
+            </p>
+
+            <div class="concept-grid">
+                <div class="concept-box">
+                    <h3>¿Qué es un Item / JSON?</h3>
+                    <p>Es simplemente un formato estandarizado para enviar datos. Si un formulario te envía una
+                        respuesta, n8n no la ve como texto, la ve como una pequeña cajita así:</p>
+                    <div class="json-example">
+                        {<br>
+                        &nbsp;&nbsp;<span class="n8n-green">"nombre"</span>: <span class="n8n-yellow">"Juan
+                            Pérez"</span>,<br>
+                        &nbsp;&nbsp;<span class="n8n-green">"empresa"</span>: <span class="n8n-yellow">"Acme
+                            Corp"</span>,<br>
+                        &nbsp;&nbsp;<span class="n8n-green">"presupuesto"</span>: <span
+                            class="n8n-yellow">5000</span><br>
+                        }
+                    </div>
+                </div>
+                <div class="concept-box">
+                    <h3>La Regla de Oro de los Nodos</h3>
+                    <p>Si a un nodo le llegan <strong>5 Items</strong> (por ejemplo, le entran 5 correos), el nodo
+                        realizará su tarea <strong>5 veces automáticamente</strong>.<br>
+                        <strong>Para decirle a Claudio:</strong> <em>"Claudio, asegúrate de que el nodo de correo agrupe
+                            la información para enviar 1 solo correo, en lugar de ejecutar 1 correo por cada item que le
+                            llegó de la base de datos."</em>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: Los Nodos Core -->
+        <div class="section-card" style="border-left-color: var(--n8n-accent);">
+            <h2>2. Los Nodos Core (Los engranes clave) ⚙️</h2>
+            <p>Aunque como Director yo gestiono más de 1,000 aplicaciones, el 80% de un buen workflow se rige usando
+                unos pocos nodos súper poderosos. Conoce sus roles:</p>
+
+            <div class="concept-grid">
+                <div class="concept-box">
+                    <span class="node-badge bg-trigger">Webhook / Triggers</span>
+                    <h3>Webhooks (Las Puertas de Entrada)</h3>
+                    <p>Un Webhook es literalmente una URL secreta. Funciona como un buzón que siempre está abierto
+                        escuchando si otra app "le avienta" datos en tiempo real.</p>
+                    <div class="communication-box">
+                        <strong>Comunícalo:</strong> "Claudio, inicia el flujo usando un nodo Webhook POST para recibir
+                        la información de pagos desde nuestro servidor."
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <span class="node-badge bg-logic">IF / Switch</span>
+                    <h3>Switch (El Semáforo Semántico)</h3>
+                    <p>Te permite enrutar datos a diferentes caminos según condiciones. Por ejemplo: Si el cliente es
+                        "VIP" que vaya al equipo A, si es "Estándar" al equipo B.</p>
+                    <div class="communication-box">
+                        <strong>Comunícalo:</strong> "Mete un Switch Node que analice el 'país' del cliente. Enruta por
+                        diferentes canales si es México, España o Colombia."
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <span class="node-badge bg-logic">Edit Fields (Set)</span>
+                    <h3>Edit Fields (El Traductor y Limpiador)</h3>
+                    <p>Antes se llamaba "Set Node". Es la herramienta para limpiar datos, renombrar variables o crear
+                        variables nuevas antes de mandarlas a otro software.</p>
+                    <div class="communication-box">
+                        <strong>Comunícalo:</strong> "Usa un nodo de Edit Fields para formatear la fecha a dd/mm/aaaa
+                        antes de insertarla en Google Sheets."
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <span class="node-badge bg-action">HTTP Request</span>
+                    <h3>HTTP Request (El Comodín)</h3>
+                    <p>Si la aplicación que quieres usar no tiene un nodo nativo de n8n, usamos este nodo para
+                        comunicarnos con <strong>cualquier API del mundo</strong>.</p>
+                    <div class="communication-box">
+                        <strong>Comunícalo:</strong> "La app X no tiene integración nativa. Revísale la documentación a
+                        su API y ármate un nodo HTTP Request con su Bearer Token."
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: Expresiones y Variables -->
+        <div class="section-card" style="border-left-color: var(--n8n-success);">
+            <h2>3. Las Expresiones (Haciéndolo Dinámico) 🧬</h2>
+            <p>Las <strong>Expresiones</strong> son la magia de n8n. Permiten que los campos se llenen solos con la
+                información que pasó por un nodo anterior, en lugar de escribir textos fijos.</p>
+            <p>En el código interno de n8n, se ven así: <code>{{ $json.nombre }}</code>. Yo me encargaré de escribirlas
+                por ti, simplemente debes saber que existen.</p>
+
+            <div class="communication-box" style="border-color: var(--n8n-success);">
+                <p><strong>Ejemplos de cómo decírselo a Claudio:</strong></p>
+                <ul>
+                    <li>"Claudio, en el campo de Asunto del correo, usa una expresión dinámica para que sea 'Hola
+                        [Nombre del usuario] tu pedido es el #[ID de pedido]' usando los datos del nodo anterior."</li>
+                    <li>"Asegúrate de referenciar el email extrayéndolo correctamente del nodo de Stripe."</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: Transformación con Código -->
+        <div class="section-card" style="border-left-color: var(--n8n-warning);">
+            <h2>4. El Botón Nuclear: El Nodo de Código (Code Node) 👨‍💻</h2>
+            <p>Gracias a mi base de conocimientos <strong>N8N Skills</strong>, sé utilizar perfectamente Python y
+                JavaScript dentro de n8n.</p>
+            <p>Usamos el nodo de Código cuando la limpieza de datos es demasiado compleja (ej. agrupar matemáticamente
+                finanzas, extraer palabras clave de un texto muy largo). Como Director, no hace falta que escribas el
+                código, solo define la regla de negocio.</p>
+
+            <div class="communication-box" style="border-color: var(--n8n-warning);">
+                <p><strong>Comunícalo:</strong> "Claudio, los datos que salen del API están muy feos, son listas
+                    anidadas gigantes. Haz un nodo de Código (prefiero JavaScript) que itere esos items, extraiga solo
+                    el total general, lo sume, y me regrese un item limpio y único con el valor."</p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 5: ¿Qué SÍ y qué NO hacer con n8n? (Restricciones) -->
+        <div class="section-card" style="border-left-color: #2F3349;">
+            <h2>5. Limites y Reglas: Lo que SÍ y lo que NO 🚫</h2>
+            <p>Es vital que como Director conozcas las fronteras de esta herramienta para evitar diseñar arquitecturas
+                inviables o pedirle a Claudio cosas para las que n8n no fue hecho.</p>
+
+            <div class="concept-grid">
+                <div class="concept-box" style="border-top: 5px solid var(--n8n-success);">
+                    <h3 style="color: var(--n8n-success);">✅ Lo que n8n hace EXCELENTE</h3>
+                    <ul>
+                        <li><strong>Orquestación (Backend):</strong> Conectar, por ejemplo, los pagos en Stripe con tu
+                            CRM y tu sistema de facturación.</li>
+                        <li><strong>Sincronización Masiva:</strong> Consumir miles de filas de un Excel o Base de Datos,
+                            transformarlas y cargarlas en otro sistema.</li>
+                        <li><strong>ETL (Extraer, Transformar y Cargar):</strong> Recibir datos en un idioma/formato
+                            complejo y convertirlos limpiamente a otro ecosistema.</li>
+                        <li><strong>Triggering por Eventos:</strong> Ejecutar secuencias exactas tipo "Si recibo un
+                            Webhook de un cliente nuevo, entonces actívate".</li>
+                    </ul>
+                </div>
+
+                <div class="concept-box" style="border-top: 5px solid var(--n8n-main);">
+                    <h3 style="color: var(--n8n-main);">❌ Lo que n8n NO ES (Restricciones)</h3>
+                    <ul>
+                        <li><strong>No es un Frontend (Web):</strong> No puedes crear aplicaciones con diseño web,
+                            botones e interfaces gráficas para tus clientes usando n8n. Es 100% "tras bambalinas".</li>
+                        <li><strong>No es una Base de Datos:</strong> n8n procesa información "en tránsito", pero no
+                            debe guardar grandes históricos de clientes en su base interna. Eso debe vivir en Airtable o
+                            SQL.</li>
+                        <li><strong>Evita Esperas Largas:</strong> Un workflow de n8n no debe quedarse literalmente
+                            "pausado esperando" 10 días a que alguien apruebe algo; corremos riesgo de <em>Timeout</em>.
+                            Es mejor romper eso en 2 workflows separados por un evento.</li>
+                        <li><strong>No es para Streaming/Gaming:</strong> Aunque es rápido, es un orquestador, por lo
+                            que no funciona como servidor de WebSockets en tiempo real de máxima exigencia para apps
+                            dinámicas.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

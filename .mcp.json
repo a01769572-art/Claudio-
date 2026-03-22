@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "n8n-mcp": {
+      "command": "npx",
+      "args": ["n8n-mcp"],
+      "env": {
+        "MCP_MODE": "stdio",
+        "LOG_LEVEL": "error",
+        "DISABLE_CONSOLE_OUTPUT": "true",
+        "N8N_API_URL": "https://jesus181920.app.n8n.cloud",
+        "N8N_API_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNTAzMjI1OC1jNjcyLTQ5YzMtOWRiYy01ZTZmM2NhNGYxMmQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiMjQwYzJkOTQtYjI1ZS00OGMwLWE5NDAtYzNhZjAxZjU4MzlhIiwiaWF0IjoxNzc0MjA1NzQ0LCJleHAiOjE3NzkzNDMyMDB9.CxQtaw7L-Ba-06N9COy21mpEMqLnQfJDIXb5GGnxNPQ"
+      }
+    },
+    "n8n-native": {
+      "type": "http",
+      "url": "https://jesus181920.app.n8n.cloud/mcp-server/http",
+      "headers": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNTAzMjI1OC1jNjcyLTQ5YzMtOWRiYy01ZTZmM2NhNGYxMmQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiMjQwYzJkOTQtYjI1ZS00OGMwLWE5NDAtYzNhZjAxZjU4MzlhIiwiaWF0IjoxNzc0MjA1NzQ0LCJleHAiOjE3NzkzNDMyMDB9.CxQtaw7L-Ba-06N9COy21mpEMqLnQfJDIXb5GGnxNPQ"
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Cotización Intrasiap — INTCOMEX Search",
+  "nodes": [
+    { "id": "intcomex-001", "name": "Trigger",      "type": "n8n-nodes-base.executeWorkflowTrigger", "typeVersion": 1, "position": [220,300], "parameters": {} },
+    { "id": "intcomex-002", "name": "Parsear Input","type": "n8n-nodes-base.code", "typeVersion": 2, "position": [440,300],
+      "parameters": { "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];" } },
+    {
+      "id": "intcomex-003", "name": "Buscar en INTCOMEX", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [660,300],
+      "parameters": {
+        "jsCode": "const productos=$('Parsear Input').first().json.productos||[];const apiKey=$vars.INTCOMEX_API_KEY;const allResults=[];\nfor(const p of productos){\n  try{\n    const resp=await $helpers.httpRequest({method:'GET',url:'https://iws.intcomex.com/api/catalog/search',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},qs:{q:p.searchQuery,country:'MX',limit:5}});\n    const items=resp.items||resp.products||resp.data||[];\n    for(const item of (Array.isArray(items)?items:[]).slice(0,3)){\n      allResults.push({mayorista:'INTCOMEX',sku:item.sku||item.partNumber||'',skuFabricante:item.vendorPartNumber||'',descripcion:item.description||item.name||'',marca:item.brand||item.vendor||p.marca,precio:Number(item.price||item.unitPrice||0),moneda:item.currency||'MXN',existencia:Number(item.quantityAvailable||item.stock||0),disponible:(item.quantityAvailable||0)>0,imagenUrl:item.imageUrl||'',productoBuscado:p.searchQuery});\n    }\n  }catch(e){allResults.push({mayorista:'INTCOMEX',error:e.message,productoBuscado:p.searchQuery});}\n}\nreturn allResults.map(r=>({json:r}));"
+      }
+    },
+    { "id": "intcomex-004", "name": "Normalizar Respuesta", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [880,300],
+      "parameters": { "jsCode": "const items=$input.all();return [{json:{mayorista:'INTCOMEX',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];" } }
+  ],
+  "connections": {
+    "Trigger":           {"main":[[{"node":"Parsear Input","type":"main","index":0}]]},
+    "Parsear Input":     {"main":[[{"node":"Buscar en INTCOMEX","type":"main","index":0}]]},
+    "Buscar en INTCOMEX":{"main":[[{"node":"Normalizar Respuesta","type":"main","index":0}]]}
+  },
+  "active": false, "settings": {"executionOrder":"v1"}
+}

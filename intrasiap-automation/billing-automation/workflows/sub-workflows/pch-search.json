@@ -1,0 +1,22 @@
+{
+  "name": "Cotización Intrasiap — PCH Search",
+  "nodes": [
+    { "id": "pch-001", "name": "Trigger",      "type": "n8n-nodes-base.executeWorkflowTrigger", "typeVersion": 1, "position": [220,300], "parameters": {} },
+    { "id": "pch-002", "name": "Parsear Input","type": "n8n-nodes-base.code", "typeVersion": 2, "position": [440,300],
+      "parameters": { "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];" } },
+    {
+      "id": "pch-003", "name": "Buscar en PCH", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [660,300],
+      "parameters": {
+        "jsCode": "const productos=$('Parsear Input').first().json.productos||[];\nconst personalId=$vars.PCH_PERSONAL_ID;\nconst h1=$vars.PCH_HEADER_1;const h2=$vars.PCH_HEADER_2;const h3=$vars.PCH_HEADER_3;\nconst allResults=[];\nfor(const p of productos){\n  try{\n    const resp=await $helpers.httpRequest({method:'GET',url:'https://shop.pchconnect.com/api/products/search',headers:{'X-Personal-ID':personalId,'X-Header-1':h1,'X-Header-2':h2,'X-Header-3':h3,'Content-Type':'application/json'},qs:{q:p.searchQuery,limit:5}});\n    const items=resp.products||resp.items||resp.data||[];\n    for(const item of (Array.isArray(items)?items:[]).slice(0,3)){\n      allResults.push({mayorista:'PCH Connect',sku:item.sku||item.partNumber||'',skuFabricante:item.manufacturerPartNumber||'',descripcion:item.description||item.name||'',marca:item.brand||p.marca,precio:Number(item.price||item.unitPrice||0),moneda:'MXN',existencia:Number(item.stock||item.quantityAvailable||0),disponible:(item.stock||0)>0,imagenUrl:item.imageUrl||'',productoBuscado:p.searchQuery});\n    }\n  }catch(e){allResults.push({mayorista:'PCH Connect',error:e.message,productoBuscado:p.searchQuery});}\n}\nreturn allResults.map(r=>({json:r}));"
+      }
+    },
+    { "id": "pch-004", "name": "Normalizar Respuesta", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [880,300],
+      "parameters": { "jsCode": "const items=$input.all();return [{json:{mayorista:'PCH Connect',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];" } }
+  ],
+  "connections": {
+    "Trigger":       {"main":[[{"node":"Parsear Input","type":"main","index":0}]]},
+    "Parsear Input": {"main":[[{"node":"Buscar en PCH","type":"main","index":0}]]},
+    "Buscar en PCH": {"main":[[{"node":"Normalizar Respuesta","type":"main","index":0}]]}
+  },
+  "active": false, "settings": {"executionOrder":"v1"}
+}

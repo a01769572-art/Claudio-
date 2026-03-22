@@ -1,0 +1,899 @@
+{
+  "name": "Cotización Intrasiap — Main",
+  "nodes": [
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-111111111111",
+      "name": "Cotización Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        220,
+        300
+      ],
+      "webhookId": "cotizacion-intrasiap-v1",
+      "parameters": {
+        "formTitle": "Cotización Intrasiap",
+        "formDescription": "Completa el formulario para generar tu benchmarking y cotización automática.",
+        "path": "cotizacion",
+        "responseMode": "onReceived",
+        "formFields": {
+          "values": [
+            {
+              "fieldType": "html",
+              "html": "<div style='background:#e8f0fe;padding:12px 16px;border-radius:8px;border-left:4px solid #1a73e8;margin-bottom:4px'><b style='color:#1a73e8'>TUS DATOS (VENDEDOR)</b></div>"
+            },
+            {
+              "fieldLabel": "Tu nombre completo",
+              "fieldType": "text",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Tu puesto",
+              "fieldType": "text",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Tu teléfono",
+              "fieldType": "text",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Tu correo (recibirás la cotización aquí)",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldType": "html",
+              "html": "<div style='background:#e8f0fe;padding:12px 16px;border-radius:8px;border-left:4px solid #1a73e8;margin-top:12px;margin-bottom:4px'><b style='color:#1a73e8'>DATOS DEL CLIENTE</b></div>"
+            },
+            {
+              "fieldLabel": "Nombre del cliente",
+              "fieldType": "text",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Puesto del cliente",
+              "fieldType": "text",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Empresa / Cuenta",
+              "fieldType": "text",
+              "requiredField": true
+            },
+            {
+              "fieldType": "html",
+              "html": "<div style='background:#e8f5e9;padding:12px 16px;border-radius:8px;border-left:4px solid #2e7d32;margin-top:12px;margin-bottom:4px'><b style='color:#2e7d32'>PRODUCTO 1</b></div>"
+            },
+            {
+              "fieldLabel": "Marca",
+              "fieldType": "text",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Descripción / Modelo",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "RAM (ej: 16GB)",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Almacenamiento (ej: 512GB SSD)",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Color",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Tipo de Memoria (ej: DDR5)",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Garantía",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Cantidad",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldType": "html",
+              "html": "<div style='background:#f3e5f5;padding:12px 16px;border-radius:8px;border-left:4px solid #7b1fa2;margin-top:12px;margin-bottom:4px'><b style='color:#7b1fa2'>PRODUCTO 2</b> (opcional)</div>"
+            },
+            {
+              "fieldLabel": "Marca",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Descripción / Modelo",
+              "fieldType": "textarea",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "RAM (ej: 32GB)",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Almacenamiento (ej: 1TB NVMe)",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Color",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Tipo de Memoria",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Garantía",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Cantidad",
+              "fieldType": "number",
+              "requiredField": false
+            },
+            {
+              "fieldType": "html",
+              "html": "<div style='background:#fff3e0;padding:12px 16px;border-radius:8px;border-left:4px solid #e65100;margin-top:12px;margin-bottom:4px'><b style='color:#e65100'>PRODUCTO 3</b> (opcional)</div>"
+            },
+            {
+              "fieldLabel": "Marca",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Descripción / Modelo",
+              "fieldType": "textarea",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "RAM",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Almacenamiento",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Color",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Tipo de Memoria",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Garantía",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Cantidad",
+              "fieldType": "number",
+              "requiredField": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-222222222222",
+      "name": "Preparar Datos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\n\n// Mapeo de campos del form (posicional por orden de definición)\nconst fields = Object.values(d).filter(v => v !== undefined);\n\n// Extraer datos por nombre de campo\nconst vendedor = {\n  nombre:   d['Tu nombre completo'] || '',\n  puesto:   d['Tu puesto'] || '',\n  telefono: d['Tu teléfono'] || '',\n  email:    d['Tu correo (recibirás la cotización aquí)'] || ''\n};\n\nconst cliente = {\n  nombre:  d['Nombre del cliente'] || '',\n  puesto:  d['Puesto del cliente'] || '',\n  empresa: d['Empresa / Cuenta'] || ''\n};\n\n// Construir productos (hasta 3)\nconst buildQuery = (marca, desc, ram, storage, color, mem, garantia) => {\n  const parts = [marca, desc, ram, storage, color, mem, garantia]\n    .filter(Boolean).join(' ');\n  return parts.trim();\n};\n\nconst productos = [];\n\n// Producto 1 (siempre presente)\nconst p1 = {\n  searchQuery: buildQuery(\n    d['Marca'],\n    d['Descripción / Modelo'],\n    d['RAM (ej: 16GB)'],\n    d['Almacenamiento (ej: 512GB SSD)'],\n    d['Color'],\n    d['Tipo de Memoria (ej: DDR5)'],\n    d['Garantía']\n  ),\n  marca:    d['Marca'] || '',\n  cantidad: Number(d['Cantidad']) || 1\n};\nif (p1.searchQuery) productos.push(p1);\n\n// Producto 2 (opcional)\nconst p2Desc = d['Descripción / Modelo_1'] || d['Descripción / Modelo (2)'] || '';\nif (p2Desc || d['Marca_1']) {\n  productos.push({\n    searchQuery: buildQuery(\n      d['Marca_1'] || '', p2Desc,\n      d['RAM (ej: 32GB)'] || '', d['Almacenamiento (ej: 1TB NVMe)'] || '',\n      d['Color_1'] || '', d['Tipo de Memoria_1'] || '', d['Garantía_1'] || ''\n    ),\n    marca:    d['Marca_1'] || '',\n    cantidad: Number(d['Cantidad_1']) || 1\n  });\n}\n\n// Producto 3 (opcional)\nconst p3Desc = d['Descripción / Modelo_2'] || '';\nif (p3Desc || d['Marca_2']) {\n  productos.push({\n    searchQuery: buildQuery(\n      d['Marca_2'] || '', p3Desc,\n      d['RAM_2'] || '', d['Almacenamiento_2'] || '',\n      d['Color_2'] || '', d['Tipo de Memoria_2'] || '', d['Garantía_2'] || ''\n    ),\n    marca:    d['Marca_2'] || '',\n    cantidad: Number(d['Cantidad_2']) || 1\n  });\n}\n\nreturn [{ json: { vendedor, cliente, productos, fechaSolicitud: new Date().toISOString() } }];"
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-333333333333",
+      "name": "Buscar en Ingram",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        700,
+        100
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Cotización Intrasiap — Ingram Search"
+        },
+        "workflowInputs": {
+          "value": {
+            "data": "={{ JSON.stringify($json) }}"
+          },
+          "schema": []
+        }
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-444444444444",
+      "name": "Buscar en SYSCOM",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        700,
+        220
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Cotización Intrasiap — SYSCOM Search"
+        },
+        "workflowInputs": {
+          "value": {
+            "data": "={{ JSON.stringify($json) }}"
+          },
+          "schema": []
+        }
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-555555555555",
+      "name": "Buscar en CT",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        700,
+        340
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Cotización Intrasiap — CT Search"
+        },
+        "workflowInputs": {
+          "value": {
+            "data": "={{ JSON.stringify($json) }}"
+          },
+          "schema": []
+        }
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-666666666666",
+      "name": "Buscar en CVA",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        700,
+        460
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Cotización Intrasiap — CVA Search"
+        },
+        "workflowInputs": {
+          "value": {
+            "data": "={{ JSON.stringify($json) }}"
+          },
+          "schema": []
+        }
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-777777777777",
+      "name": "Buscar en INTCOMEX",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        700,
+        580
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Cotización Intrasiap — INTCOMEX Search"
+        },
+        "workflowInputs": {
+          "value": {
+            "data": "={{ JSON.stringify($json) }}"
+          },
+          "schema": []
+        }
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-888888888888",
+      "name": "Buscar en PCH",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        700,
+        700
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Cotización Intrasiap — PCH Search"
+        },
+        "workflowInputs": {
+          "value": {
+            "data": "={{ JSON.stringify($json) }}"
+          },
+          "schema": []
+        }
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-999999999999",
+      "name": "Consolidar Resultados",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        960,
+        400
+      ],
+      "parameters": {
+        "mode": "append",
+        "options": {}
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-aaaaaaaaaaaa",
+      "name": "Preparar Contexto para IA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1180,
+        400
+      ],
+      "parameters": {
+        "jsCode": "// Consolidar todos los resultados de mayoristas en un solo objeto\nconst items = $input.all();\nconst resultadosMayoristas = items.map(i => i.json).filter(r => r && r.mayorista);\n\n// Recuperar datos originales del primer ítem (pasados como metadata)\nconst metadata = items.find(i => i.json.vendedor)?.json || {};\n\nreturn [{\n  json: {\n    vendedor:             metadata.vendedor || {},\n    cliente:              metadata.cliente || {},\n    productos:            metadata.productos || [],\n    fechaSolicitud:       metadata.fechaSolicitud || new Date().toISOString(),\n    resultadosMayoristas: resultadosMayoristas\n  }\n}];"
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-bbbbbbbbbbbb",
+      "name": "Agente Benchmarking",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1400,
+        400
+      ],
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define",
+        "text": "={{ JSON.stringify($json) }}",
+        "systemMessage": "Eres un analista de precios B2B especializado en tecnología. Recibes un JSON con los resultados de búsqueda de varios mayoristas mexicanos y debes generar:\n\n1. Un JSON de benchmarking con el producto ganador (menor precio con stock) para cada producto solicitado.\n2. HTML completo para un reporte PDF de benchmarking con tabla comparativa, ganadores marcados con ⭐, y análisis de ahorro.\n\nFormato de respuesta (JSON puro):\n{\n  \"benchmarking\": [\n    {\n      \"productoSolicitado\": \"...\",\n      \"cantidad\": 1,\n      \"ganador\": { \"mayorista\": \"...\", \"descripcion\": \"...\", \"sku\": \"...\", \"precio\": 0, \"existencia\": 0 },\n      \"tabla\": [],\n      \"ahorroPotencial\": 0,\n      \"ahorroPorcentaje\": 0\n    }\n  ],\n  \"htmlReporte\": \"<!DOCTYPE html>...\"\n}\n\nReglas:\n- Solo productos con existencia > 0 compiten por ser ganador\n- Precios en MXN (si ves USD, multiplica por 18)\n- El HTML debe ser profesional, con estilo Intrasiap (azul #0066cc)\n- Incluye logo textual INTRASIAP en el header del HTML\n- Devuelve SOLO el JSON, sin markdown ni explicaciones"
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-cccccccccccc",
+      "name": "Gemini 2.0 Flash (Benchmarking)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        580
+      ],
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "maxOutputTokens": 8192
+        }
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BP2GelDlrjXM1Bi1",
+          "name": "Google Gemini — Intrasiap"
+        }
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-dddddddddddd",
+      "name": "Parsear Respuesta Benchmarking",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1620,
+        400
+      ],
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.output || $input.first().json.text || '';\nlet parsed;\ntry {\n  const jsonMatch = raw.match(/\\{[\\s\\S]*\\}/);\n  parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw);\n} catch(e) {\n  parsed = { benchmarking: [], htmlReporte: '<p>Error parsing benchmarking</p>' };\n}\n\n// Pasar metadata junto con benchmarking\nconst meta = $('Preparar Contexto para IA').first().json;\nreturn [{ json: { ...meta, ...parsed } }];"
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-eeeeeeeeeeee",
+      "name": "Agente Excel (Gemini)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1840,
+        400
+      ],
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define",
+        "text": "={{ JSON.stringify({ vendedor: $json.vendedor, cliente: $json.cliente, benchmarking: $json.benchmarking, fechaSolicitud: $json.fechaSolicitud }) }}",
+        "systemMessage": "={{ $('Agente Benchmarking').first().json }}\n\nEres un agente de procesamiento de datos para Intrasiap. Recibes el resultado del benchmarking y devuelves un objeto JSON con exactamente qué valor va en qué celda del template de cotización.\n\nMapa de celdas:\n- B10: clienteNombre, F10: serial Excel fecha hoy, B11: clientePuesto, B12: clienteEmpresa\n- D26: serial Excel fecha hoy + 5 días\n- B34: vendedorNombre, B35: vendedorPuesto, B36: 'Teléfono: '+vendedorTelefono, B37: 'www.intrasiap.com.mx'\n- Productos desde fila 15: B=partida, C=cantidad, D=descripcion, E=precio*1.10, F=E*C, H=existencia, I=sku, J=mayorista, K=costo, L=K*C, M=E-K, N=M*C, O=M/K, P=F*0.16, Q=0\n\nSerial Excel = Math.floor(Date.now()/86400000 + 25569)\n\nDevuelve ÚNICAMENTE el JSON sin explicaciones:\n{ \"celdas\": {...}, \"productos\": [...] }"
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-ffffffffffff",
+      "name": "Gemini 2.0 Flash (Excel)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        580
+      ],
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "maxOutputTokens": 4096
+        }
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BP2GelDlrjXM1Bi1",
+          "name": "Google Gemini — Intrasiap"
+        }
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-001100110011",
+      "name": "Parsear y Generar Excel",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        400
+      ],
+      "parameters": {
+        "jsCode": "// Parsear respuesta del agente Excel\nconst raw = $input.first().json.output || $input.first().json.text || '';\nlet excelData;\ntry {\n  const m = raw.match(/\\{[\\s\\S]*\\}/);\n  excelData = JSON.parse(m ? m[0] : raw);\n} catch(e) {\n  excelData = { celdas: {}, productos: [] };\n}\n\n// Recuperar HTML del benchmarking y metadata\nconst meta = $('Parsear Respuesta Benchmarking').first().json;\n\nreturn [{\n  json: {\n    excelData,\n    htmlReporte:    meta.htmlReporte || '',\n    vendedorEmail:  meta.vendedor?.email || '',\n    clienteNombre:  meta.cliente?.nombre || '',\n    fechaSolicitud: meta.fechaSolicitud || new Date().toISOString()\n  }\n}];"
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-002200220022",
+      "name": "Generar PDF Benchmarking",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1,
+      "position": [
+        2280,
+        300
+      ],
+      "parameters": {
+        "operation": "generatePdf",
+        "html": "={{ $json.htmlReporte }}",
+        "options": {
+          "format": "A4",
+          "margin": {
+            "top": "20mm",
+            "bottom": "20mm",
+            "left": "15mm",
+            "right": "15mm"
+          }
+        },
+        "binaryPropertyName": "benchmarkPdf"
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-005500550055",
+      "name": "Enviar Cotización por Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3160,
+        400
+      ],
+      "parameters": {
+        "operation": "send",
+        "sendTo": "={{ $json.vendedorEmail }}",
+        "subject": "={{ $json.asunto }}",
+        "emailType": "text",
+        "message": "={{ $json.cuerpoEmail }}",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "benchmarkPdf"
+              },
+              {
+                "property": "cotizacionPdf"
+              }
+            ]
+          }
+        },
+        "attachmentsUi": {
+          "attachmentsBinary": [
+            {
+              "property": "benchmarkPdf"
+            },
+            {
+              "property": "cotizacionPdf"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "o2h4adkmnVDG1P5R",
+          "name": "Gmail — Intrasiap"
+        }
+      }
+    },
+    {
+      "id": "aa000001-0000-0000-0000-000000000001",
+      "name": "Preparar Datos Sheets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2280,
+        400
+      ],
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst excelData = d.excelData || {};\nconst celdas = excelData.celdas || {};\nconst productos = excelData.productos || [];\n\nconst data = [];\n\n// Celdas individuales\nfor (const [cell, value] of Object.entries(celdas)) {\n  data.push({ range: 'Hoja1!' + cell, values: [[value]] });\n}\n\n// Filas de productos desde fila 15\nproductos.forEach((p, i) => {\n  const row = 15 + i;\n  const cols = ['B','C','D','E','F','H','I','J','K','L','M','N','O','P','Q'];\n  const vals = [p.partida||i+1, p.cantidad||1, p.descripcion||'', p.precioVenta||0,\n    p.totalVenta||0, p.existencia||0, p.sku||'', p.mayorista||'',\n    p.costoUnitario||0, p.costoTotal||0, p.utilidadUnitaria||0,\n    p.utilidadTotal||0, p.utilidadPct||0, p.iva||0, 0];\n  cols.forEach((col, ci) => {\n    data.push({ range: 'Hoja1!' + col + row, values: [[vals[ci]]] });\n  });\n});\n\nreturn [{\n  json: {\n    batchUpdatePayload: { valueInputOption: 'USER_ENTERED', data },\n    vendedorEmail: d.vendedorEmail || '',\n    clienteNombre: d.clienteNombre || '',\n    fechaSolicitud: d.fechaSolicitud || new Date().toISOString(),\n    htmlReporte: d.htmlReporte || ''\n  }\n}];"
+      }
+    },
+    {
+      "id": "aa000001-0000-0000-0000-000000000002",
+      "name": "Escribir en Google Sheets",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2500,
+        400
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/1nKR9aZEypht72WH5IqVRHQaXGG48dLdr/values:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.batchUpdatePayload) }}",
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxP9ldRc6LX4DrhD",
+          "name": "Google Sheets — Intrasiap"
+        }
+      }
+    },
+    {
+      "id": "aa000001-0000-0000-0000-000000000003",
+      "name": "Exportar Cotización PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2720,
+        400
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://docs.google.com/spreadsheets/d/1nKR9aZEypht72WH5IqVRHQaXGG48dLdr/export?format=pdf&gid=1605095800&portrait=true&fitw=true&gridlines=false",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "cotizacionPdf"
+            }
+          }
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxP9ldRc6LX4DrhD",
+          "name": "Google Sheets — Intrasiap"
+        }
+      }
+    },
+    {
+      "id": "f1a2b3c4-d5e6-7890-abcd-004400440044",
+      "name": "Preparar Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2940,
+        400
+      ],
+      "parameters": {
+        "jsCode": "const meta = $('Preparar Datos Sheets').first().json;\nconst fecha = new Date().toLocaleDateString('es-MX');\nreturn [{\n  json: {\n    vendedorEmail:  meta.vendedorEmail || '',\n    asunto:         'Cotización ' + (meta.clienteNombre||'') + ' — ' + fecha,\n    cuerpoEmail:    'Estimado/a vendedor/a,\\n\\nAdjunto encontrarás:\\n\\n1. Reporte de benchmarking de precios (todos los mayoristas consultados)\\n2. Cotización lista para entregar al cliente\\n\\nIntrasiap Automation System'\n  },\n  binary: {\n    benchmarkPdf:   $('Generar PDF Benchmarking').first().binary?.benchmarkPdf,\n    cotizacionPdf:  $('Exportar Cotización PDF').first().binary?.cotizacionPdf\n  }\n}];"
+      }
+    }
+  ],
+  "connections": {
+    "Cotización Form": {
+      "main": [
+        [
+          {
+            "node": "Preparar Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Datos": {
+      "main": [
+        [
+          {
+            "node": "Buscar en Ingram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Buscar en SYSCOM",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Buscar en CT",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Buscar en CVA",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Buscar en INTCOMEX",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Buscar en PCH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar en Ingram": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar en SYSCOM": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar en CT": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar en CVA": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar en INTCOMEX": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar en PCH": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidar Resultados": {
+      "main": [
+        [
+          {
+            "node": "Preparar Contexto para IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Contexto para IA": {
+      "main": [
+        [
+          {
+            "node": "Agente Benchmarking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini 2.0 Flash (Benchmarking)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Benchmarking",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Benchmarking": {
+      "main": [
+        [
+          {
+            "node": "Parsear Respuesta Benchmarking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear Respuesta Benchmarking": {
+      "main": [
+        [
+          {
+            "node": "Agente Excel (Gemini)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini 2.0 Flash (Excel)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Excel (Gemini)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Excel (Gemini)": {
+      "main": [
+        [
+          {
+            "node": "Parsear y Generar Excel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear y Generar Excel": {
+      "main": [
+        [
+          {
+            "node": "Preparar Datos Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar PDF Benchmarking": {
+      "main": [
+        [
+          {
+            "node": "Preparar Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Datos Sheets": {
+      "main": [
+        [
+          {
+            "node": "Generar PDF Benchmarking",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Escribir en Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escribir en Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Exportar Cotización PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exportar Cotización PDF": {
+      "main": [
+        [
+          {
+            "node": "Preparar Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Email": {
+      "main": [
+        [
+          {
+            "node": "Enviar Cotización por Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

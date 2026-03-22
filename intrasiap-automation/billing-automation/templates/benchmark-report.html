@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    /* ─── Base ─── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; color: #1a1a2e; background: #fff; padding: 24px; }
+
+    /* ─── Header ─── */
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 3px solid #0066cc; padding-bottom: 16px; }
+    .header .logo { font-size: 22px; font-weight: 800; color: #0066cc; }
+    .header .meta { text-align: right; color: #555; font-size: 10px; line-height: 1.8; }
+    .header .meta strong { color: #1a1a2e; }
+
+    /* ─── Título de sección ─── */
+    .section-title { font-size: 13px; font-weight: 700; color: #0066cc; border-left: 4px solid #0066cc; padding-left: 10px; margin: 20px 0 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ─── Info del cliente ─── */
+    .client-info { background: #f5f8ff; border: 1px solid #d0e0ff; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; display: flex; gap: 40px; }
+    .client-info .field label { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: .05em; }
+    .client-info .field p { font-weight: 600; font-size: 11px; margin-top: 2px; }
+
+    /* ─── Tabla de benchmarking ─── */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    thead tr { background: #0066cc; color: white; }
+    thead th { padding: 9px 10px; text-align: left; font-size: 10px; font-weight: 600; letter-spacing: .04em; }
+    tbody tr { border-bottom: 1px solid #e8edf5; }
+    tbody tr:nth-child(even) { background: #f8faff; }
+    tbody tr.ganador { background: #e6f4ea; border-left: 4px solid #2e7d32; }
+    tbody td { padding: 9px 10px; font-size: 10px; vertical-align: middle; }
+    tbody td.precio { font-weight: 700; font-size: 11px; }
+    tbody td.ganador-badge { color: #2e7d32; font-weight: 700; }
+    tbody tr.no-stock td { color: #999; font-style: italic; }
+
+    /* ─── Badge ganador ─── */
+    .badge-ganador { display: inline-block; background: #2e7d32; color: white; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 700; }
+    .badge-nostock { display: inline-block; background: #e0e0e0; color: #666; padding: 2px 8px; border-radius: 10px; font-size: 9px; }
+
+    /* ─── Resumen de ahorro ─── */
+    .ahorro-box { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border: 1px solid #a5d6a7; border-radius: 8px; padding: 14px 18px; margin: 8px 0 20px; }
+    .ahorro-box h4 { color: #2e7d32; font-size: 12px; margin-bottom: 8px; }
+    .ahorro-box p { color: #1b5e20; font-size: 11px; line-height: 1.8; }
+    .ahorro-box .monto { font-size: 16px; font-weight: 800; color: #1b5e20; }
+
+    /* ─── Footer ─── */
+    .footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid #ddd; font-size: 9px; color: #999; display: flex; justify-content: space-between; }
+
+    /* ─── Página separadora por producto ─── */
+    .product-block { margin-bottom: 36px; page-break-inside: avoid; }
+    .product-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .product-specs { font-size: 10px; color: #555; margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <div class="logo">INTRASIAP</div>
+      <div style="font-size:10px; color:#555; margin-top:4px;">Reporte de Benchmarking de Precios</div>
+    </div>
+    <div class="meta">
+      <strong>Fecha:</strong> {{fechaConsulta}}<br>
+      <strong>Vigencia cotización:</strong> {{fechaVigencia}}<br>
+      <strong>Vendedor:</strong> {{vendedorNombre}}<br>
+      <strong>Mayoristas consultados:</strong> {{mayoristasConsultados}}
+    </div>
+  </div>
+
+  <!-- INFO CLIENTE -->
+  <div class="client-info">
+    <div class="field">
+      <label>Cliente</label>
+      <p>{{clienteNombre}}</p>
+    </div>
+    <div class="field">
+      <label>Puesto</label>
+      <p>{{clientePuesto}}</p>
+    </div>
+    <div class="field">
+      <label>Cuenta / Empresa</label>
+      <p>{{clienteCuenta}}</p>
+    </div>
+  </div>
+
+  <!-- BLOQUE POR PRODUCTO — se repite por cada producto -->
+  <!-- {{#each productos}} -->
+  <div class="product-block">
+    <div class="section-title">Producto {{@index_plus_1}}</div>
+    <div class="product-title">{{productoSolicitado}}</div>
+    <div class="product-specs">Especificaciones solicitadas: {{especificaciones}}</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Mayorista</th>
+          <th>Descripción</th>
+          <th>SKU</th>
+          <th class="precio">Precio MXN</th>
+          <th>Existencia</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- {{#each tabla}} -->
+        <tr class="{{#if esGanador}}ganador{{/if}} {{#unless disponible}}no-stock{{/unless}}">
+          <td>{{@index_plus_1}}</td>
+          <td><strong>{{mayorista}}</strong></td>
+          <td>{{descripcion}}</td>
+          <td style="font-family:monospace; font-size:9px;">{{sku}}</td>
+          <td class="precio">${{precio}}</td>
+          <td>{{existencia}}</td>
+          <td>
+            {{#if esGanador}}<span class="badge-ganador">⭐ MEJOR PRECIO</span>{{/if}}
+            {{#unless disponible}}<span class="badge-nostock">Sin stock</span>{{/unless}}
+          </td>
+        </tr>
+        <!-- {{/each}} -->
+      </tbody>
+    </table>
+
+    <div class="ahorro-box">
+      <h4>Análisis de ahorro</h4>
+      <p>
+        Cotizando con <strong>{{ganador.mayorista}}</strong> a
+        <span class="monto">${{ganador.precio}} MXN</span><br>
+        Ahorras <strong>${{ahorroPotencial}} MXN ({{ahorroPortentaje}}%)</strong> vs el mayorista más caro disponible.
+      </p>
+    </div>
+  </div>
+  <!-- {{/each}} -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>Generado automáticamente por Intrasiap Billing Automation</span>
+    <span>{{vendedorNombre}} | {{vendedorEmail}}</span>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "Cotización Intrasiap — CT Search",
+  "nodes": [
+    { "id": "ct-001", "name": "Trigger",      "type": "n8n-nodes-base.executeWorkflowTrigger", "typeVersion": 1, "position": [220,300], "parameters": {} },
+    { "id": "ct-002", "name": "Parsear Input","type": "n8n-nodes-base.code", "typeVersion": 2, "position": [440,300],
+      "parameters": { "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];" } },
+    {
+      "id": "ct-003", "name": "Buscar en CT", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [660,300],
+      "parameters": {
+        "jsCode": "const productos=$('Parsear Input').first().json.productos||[];const token=$vars.CT_TOKEN;const allResults=[];\nfor(const p of productos){\n  try{\n    const resp=await $helpers.httpRequest({method:'GET',url:'https://api.ctonline.mx/catalogo',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},qs:{q:p.searchQuery,limit:5}});\n    const items=resp.productos||resp.data||[];\n    for(const item of (Array.isArray(items)?items:[]).slice(0,3)){\n      allResults.push({mayorista:'CT Internacional',sku:item.clave||item.id||'',skuFabricante:item.numero_parte||'',descripcion:item.nombre||item.descripcion||'',marca:item.marca||p.marca,precio:Number(item.precio||0),moneda:'MXN',existencia:Number(item.existencia||0),disponible:(item.existencia||0)>0,imagenUrl:item.imagen||'',productoBuscado:p.searchQuery});\n    }\n  }catch(e){allResults.push({mayorista:'CT Internacional',error:e.message,productoBuscado:p.searchQuery});}\n}\nreturn allResults.map(r=>({json:r}));"
+      }
+    },
+    { "id": "ct-004", "name": "Normalizar Respuesta", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [880,300],
+      "parameters": { "jsCode": "const items=$input.all();return [{json:{mayorista:'CT Internacional',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];" } }
+  ],
+  "connections": {
+    "Trigger":      {"main":[[{"node":"Parsear Input","type":"main","index":0}]]},
+    "Parsear Input":{"main":[[{"node":"Buscar en CT","type":"main","index":0}]]},
+    "Buscar en CT": {"main":[[{"node":"Normalizar Respuesta","type":"main","index":0}]]}
+  },
+  "active": false, "settings": {"executionOrder":"v1"}
+}

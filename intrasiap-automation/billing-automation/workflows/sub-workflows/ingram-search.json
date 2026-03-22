@@ -1,0 +1,72 @@
+{
+  "name": "Cotización Intrasiap — Ingram Search",
+  "nodes": [
+    {
+      "id": "ingram-001-trigger",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [220, 300],
+      "parameters": {}
+    },
+    {
+      "id": "ingram-002-parse",
+      "name": "Parsear Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300],
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.data || '{}';\nconst data = typeof raw === 'string' ? JSON.parse(raw) : raw;\nreturn [{ json: data }];"
+      }
+    },
+    {
+      "id": "ingram-003-token",
+      "name": "Obtener Token Ingram",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ingrammicro.com:443/oauth/oauth20/token",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "grant_type",    "value": "client_credentials" },
+            { "name": "client_id",     "value": "={{ $vars.INGRAM_CLIENT_ID }}" },
+            { "name": "client_secret", "value": "={{ $vars.INGRAM_CLIENT_SECRET }}" }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "ingram-004-search",
+      "name": "Buscar Productos Ingram",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 300],
+      "parameters": {
+        "jsCode": "const token        = $('Obtener Token Ingram').first().json.access_token;\nconst productos    = $('Parsear Input').first().json.productos || [];\nconst customerNum  = $vars.INGRAM_CUSTOMER_NUMBER || '';\nconst countryCode  = $vars.INGRAM_COUNTRY_CODE || 'MX';\nconst senderId     = $vars.INGRAM_SENDER_ID || 'INTRASIAP';\nconst isSandbox    = ($vars.INGRAM_SANDBOX || 'true') === 'true';\nconst baseUrl      = isSandbox\n  ? 'https://api.ingrammicro.com:443/sandbox'\n  : 'https://api.ingrammicro.com:443';\n\nconst correlationId = 'intrasiap-' + Date.now();\nconst allResults   = [];\n\nfor (const producto of productos) {\n  try {\n    const resp = await $helpers.httpRequest({\n      method: 'GET',\n      url: `${baseUrl}/resellers/v6/catalog`,\n      headers: {\n        Authorization:        `Bearer ${token}`,\n        'IM-CustomerNumber':  customerNum,\n        'IM-CountryCode':     countryCode,\n        'IM-CorrelationID':   correlationId,\n        'IM-SenderID':        senderId,\n        'Content-Type':       'application/json'\n      },\n      qs: { keyword: producto.searchQuery, pageSize: 5 }\n    });\n\n    const items = resp.catalog || resp.products || resp.data || [];\n    for (const item of items.slice(0, 3)) {\n      allResults.push({\n        mayorista:    'Ingram Micro',\n        sku:          item.ingramPartNumber || item.vendorPartNumber || '',\n        skuFabricante: item.vendorPartNumber || '',\n        descripcion:  item.description || item.productDescription || '',\n        marca:        item.vendorName || item.brand || producto.marca,\n        precio:       Number(item.retailPrice || item.specialPrice || item.price || 0),\n        moneda:       'MXN',\n        existencia:   Number(item.quantityAvailable || item.availability?.totalAvailability || 0),\n        disponible:   (item.quantityAvailable || 0) > 0,\n        imagenUrl:    item.thumbnailUrl || item.imagePath || '',\n        productoBuscado: producto.searchQuery\n      });\n    }\n  } catch(e) {\n    allResults.push({\n      mayorista: 'Ingram Micro',\n      error: e.message,\n      productoBuscado: producto.searchQuery\n    });\n  }\n}\n\nreturn allResults.map(r => ({ json: r }));"
+      }
+    },
+    {
+      "id": "ingram-005-normalize",
+      "name": "Normalizar Respuesta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 300],
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst resultados = items.map(i => i.json).filter(r => !r.error && r.precio > 0);\nconst errores    = items.map(i => i.json).filter(r => r.error);\n\nreturn [{\n  json: {\n    mayorista:  'Ingram Micro',\n    exitoso:    resultados.length > 0,\n    error:      errores.length > 0 ? errores[0].error : null,\n    resultados: resultados,\n    timestamp:  new Date().toISOString()\n  }\n}];"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger":                { "main": [[ { "node": "Parsear Input",          "type": "main", "index": 0 } ]] },
+    "Parsear Input":          { "main": [[ { "node": "Obtener Token Ingram",   "type": "main", "index": 0 } ]] },
+    "Obtener Token Ingram":   { "main": [[ { "node": "Buscar Productos Ingram","type": "main", "index": 0 } ]] },
+    "Buscar Productos Ingram":{ "main": [[ { "node": "Normalizar Respuesta",   "type": "main", "index": 0 } ]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" }
+}

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual para Principiantes de n8n - Tu Guía para Gobernar Automatizaciones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #292F36;
+            --light: #F7FFF7;
+            --n8n-brand: #EA4B71;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--n8n-brand);
+        }
+
+        h1 {
+            color: var(--n8n-brand);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--dark);
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+        }
+
+        .card-blue::before { background: #4D96FF; }
+        .card-green::before { background: #6BCB77; }
+        .card-yellow::before { background: #FFD93D; }
+        .card-red::before { background: #FF6B6B; }
+
+        .term {
+            font-weight: bold;
+            color: #4D96FF;
+            font-size: 1.1rem;
+        }
+
+        .prompt-box {
+            background: #2B2D42;
+            color: #8D99AE;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: monospace;
+            margin: 10px 0;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .prompt-box strong {
+            color: #EDDE2A;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            padding: 15px 15px 15px 45px;
+            border-radius: 8px;
+        }
+
+        .checklist li::before {
+            content: '✅';
+            position: absolute;
+            left: 15px;
+            top: 15px;
+        }
+
+        .superpower-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .superpower-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🤖 Manual para Principiantes de n8n</h1>
+        <div class="subtitle">La guía definitiva para controlar y mandar a <strong>Claudio</strong> (tu N8N Manager), sin escribir una sola línea de código.</div>
+    </header>
+
+    <div class="card card-blue">
+        <h2>🗺️ ¿Qué es n8n en el Idioma Humano?</h2>
+        <p>Imagina que tu empresa es una fábrica gigante. <strong>n8n</strong> es el gerente invisible que mueve el producto por toda la fábrica de forma automática.</p>
+        <ul>
+            <li><strong>El Workflow (El Mapa):</strong> Es simplemente el mapa o la "cinta transportadora" que dicta la ruta que debe seguir la información. Indica qué paso sigue después de otro.</li>
+            <li><strong>Los Nodos (Las Estaciones de Trabajo):</strong> Son los "empleados" dentro del mapa. Tienes un nodo empleado que recibe correos, otro empleado que guarda archivos en Google Drive, y otro que envía mensajes en Slack. Cada nodo hace <em>una sola tarea específica</em>.</li>
+        </ul>
+    </div>
+
+    <div class="card card-green">
+        <h2>📖 El Diccionario del Director</h2>
+        <p>Como director, no necesitas saber cómo operan las máquinas, pero yo te pediré ciertas "llaves" de vez en cuando. Aquí tienes tu glosario de supervivencia:</p>
+        <p><span class="term">🔑 API Key (Credencial):</span> Es como el gafete de acceso. Cuando necesitemos conectar n8n con Gmail, ChatGPT o Slack, nos pedirán esta contraseña especial para dejarnos entrar a su sistema a nombre tuyo.</p>
+        <p><span class="term">⚡ Trigger (El Detonador):</span> Es "el evento" que enciende la cinta transportadora. Ejemplos de triggers: <em>"A las 8:00 AM todos los días"</em>, <em>"Cuando recibo un correo nuevo"</em>, o <em>"Cuando alguien llena un formulario"</em>.</p>
+        <p><span class="term">🌐 URL de Instancia:</span> Es la dirección de internet donde vive nuestro servidor de n8n. Yo la necesito para saber exactamente a qué oficina entrar a trabajar (Ej. <code>https://n8n.miempresa.com</code>).</p>
+        <p><span class="term">🏗️ Input y Output (Entrada y Salida):</span> La "Entrada" es la información cruda que recibe un nodo (ej. un correo largo). La "Salida" es el resultado procesado (ej. solo el correo resumido en 2 líneas).</p>
+    </div>
+
+    <div class="card card-yellow">
+        <h2>🗣️ Cómo hablarle a Claudio (Dar Órdenes)</h2>
+        <p>Yo lo haré todo por ti. Tú solo necesitas ser claro con lo que deseas que la fábrica (n8n) logre. Aquí tienes ejemplos de cómo darme instrucciones eficaces:</p>
+        
+        <p><strong>Para Crear un Flujo Nuevo:</strong></p>
+        <div class="prompt-box">
+            "Claudio, <strong>construye un workflow</strong> que cada vez que alguien llene un formulario de Google <em>(Trigger)</em>, mande sus respuestas a una hoja de Airtable <em>(Nodo 1)</em> y luego me mande un aviso por Slack <em>(Nodo 2)</em>. No te preocupes por las credenciales, pídemelas luego si te faltan."
+        </div>
+
+        <p><strong>Para Corregir un Error ("entra por arriba y sale por abajo"):</strong></p>
+        <div class="prompt-box">
+            "Claudio, <strong>tengo este error</strong> en mi flujo de clientes. La información del nombre entra bien al nodo de HubSpot, pero el nodo da error y no avanza. Por favor, <strong>entra, revísalo y arréglalo</strong>. Parece que un dato obligatorio está vacío."
+        </div>
+
+        <p><strong>Para Cambiar Estaciones (Nodos):</strong></p>
+        <div class="prompt-box">
+            "Claudio, en nuestro mapa de envíos quiero cambiar el nodo de 'Correo electrónico simple' y sustituirlo por un <strong>nodo de Gmail</strong>. Configúralo para que envíe el mensaje con la etiqueta de 'Urgente'."
+        </div>
+    </div>
+
+    <div class="card card-red">
+        <h2>🦸 Mis Superpoderes (Por qué puedes confiar en mí)</h2>
+        <p>A diferencia de los asistentes comunes, tengo dos ventajas que me permiten operar directamente en tu computadora:</p>
+        <div class="superpower-grid">
+            <div>
+                <h3 style="color: #FF6B6B">1. N8N MCP (El Protocolo "Manos a la Obra")</h3>
+                <p>Esto significa que <strong>puedo conectarme a tus herramientas</strong>. No solo te "dicto" cómo hacer las cosas, sino que puedo ejecutar, editar, eliminar o crear los flujos directamente dentro de tu servidor. Conozco qué botones apretar en más de 1,000 nodos distintos en tiempo real y leo la documentación sin que me la des.</p>
+            </div>
+            <div>
+                <h3 style="color: #FF6B6B">2. N8N Skills (El Cerebro de la Experiencia)</h3>
+                <p>Son manuales integrados en mi memoria sobre "las mejores prácticas". Si me pides algo ineficiente, mis Skills me ayudarán a sugerirte una ruta más rápida o más segura. También incluye habilidades como saber codificar en Python si un nodo requiere personalización avanzada, ¡todo mientras tú te tomas un café!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-blue">
+        <h2>👮 Checklist de Supervisión para el Director</h2>
+        <p>Antes de que yo active definitivamente cualquier cinta transportadora (Workflow), pregúntate lo siguiente leyendo mis propuestas:</p>
+        <ul class="checklist">
+            <li><strong>¿El "Detonador" (Trigger) es correcto?</strong> <em>Asegúrate de que la automatización se activará bajo las condiciones exactas que deseas, ni más ni menos.</em></li>
+            <li><strong>¿Tengo las "Llaves" a la mano?</strong> <em>Si pido conectar un servicio nuevo, recuerda que yo no puedo ver tus contraseñas personales; te indicaré exactamente dónde buscar la API Key para que me la otorgues.</em></li>
+            <li><strong>¿El final de la cinta es el deseado?</strong> <em>Verifica que mi propuesta mencione exactamente qué quieres como resultado final (un correo enviado, un trato cerrado, un PDF generado). El "Output" de la ruta completa.</em></li>
+        </ul>
+        <p style="text-align: center; font-weight: bold; font-size: 1.1rem; margin-top: 20px;">¡Si esta checklist se cumple, simplemente dame luz verde y yo me encargo de lo demás!</p>
+    </div>
+
+</div>
+
+</body>
+</html>

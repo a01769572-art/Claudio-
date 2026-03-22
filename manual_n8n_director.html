@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual para Directores: n8n con Claudio</title>
+  <style>
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:         #0f1117;
+      --surface:    #1a1d27;
+      --surface2:   #232636;
+      --border:     #2e3248;
+      --accent:     #7c6ff7;
+      --accent2:    #5eead4;
+      --accent3:    #f97316;
+      --accent4:    #facc15;
+      --text:       #e2e8f0;
+      --text-muted: #8892a4;
+      --danger:     #f87171;
+      --success:    #4ade80;
+      --radius:     12px;
+      --radius-sm:  8px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    /* ─── Sidebar Navigation ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 28px 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+    .nav-logo {
+      padding: 0 24px 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .nav-logo .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .nav-logo h2 {
+      margin-top: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .nav-logo p { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+    .nav-section { padding: 0 16px; margin-bottom: 8px; }
+    .nav-section-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0 8px;
+      margin-bottom: 6px;
+    }
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      transition: all .15s ease;
+    }
+    nav a:hover { background: var(--surface2); color: var(--text); }
+    nav a.active { background: rgba(124,111,247,.15); color: var(--accent); }
+    nav a .icon { font-size: 1rem; flex-shrink: 0; }
+
+    /* ─── Main Content ─── */
+    main {
+      margin-left: 260px;
+      padding: 48px 56px;
+      max-width: 1100px;
+    }
+
+    /* ─── Section Hero ─── */
+    .page-hero {
+      text-align: center;
+      padding: 56px 32px;
+      background: linear-gradient(135deg, rgba(124,111,247,.12), rgba(94,234,212,.08));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      margin-bottom: 56px;
+    }
+    .page-hero .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .page-hero h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #fff, var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-hero p {
+      margin-top: 16px;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat .num { font-size: 1.8rem; font-weight: 800; color: var(--accent2); }
+    .stat .lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+
+    /* ─── Sections ─── */
+    section { margin-bottom: 72px; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .section-number {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .section-header h2 span { color: var(--accent2); }
+
+    /* ─── Cards ─── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card p { color: var(--text-muted); line-height: 1.8; }
+
+    /* ─── Analogy Box ─── */
+    .analogy-box {
+      background: linear-gradient(135deg, rgba(124,111,247,.1), rgba(168,85,247,.06));
+      border: 1px solid rgba(124,111,247,.3);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 24px 0;
+    }
+    .analogy-box .label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .analogy-box p { color: var(--text); line-height: 1.8; }
+
+    /* ─── Grid layouts ─── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    @media (max-width: 800px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      nav { display: none; }
+      main { margin-left: 0; padding: 24px 20px; }
+    }
+
+    /* ─── Dictionary Terms ─── */
+    .term-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 16px;
+      transition: border-color .2s;
+    }
+    .term-card:hover { border-color: var(--accent); }
+    .term-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .term-tag {
+      background: rgba(124,111,247,.15);
+      color: var(--accent);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .term-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .term-card .definition { color: var(--text-muted); line-height: 1.8; }
+    .term-card .analogy {
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      color: var(--accent4);
+      border-left: 3px solid var(--accent4);
+    }
+    .term-card .analogy strong { color: var(--accent4); }
+
+    /* ─── Prompt Examples ─── */
+    .prompt-block {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin: 16px 0;
+      overflow: hidden;
+    }
+    .prompt-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .prompt-header .tag-user { color: var(--accent2); }
+    .prompt-header .tag-system { color: var(--accent); }
+    .prompt-body {
+      padding: 18px 20px;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .prompt-body .highlight { color: var(--accent4); font-weight: 600; }
+    .prompt-note {
+      padding: 10px 20px 16px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* ─── Superpower Cards ─── */
+    .power-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .power-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .power-card.mcp::before { background: linear-gradient(90deg, var(--accent), #a855f7); }
+    .power-card.skills::before { background: linear-gradient(90deg, var(--accent2), #22d3ee); }
+    .power-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; }
+    .power-card .subtitle { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px; }
+    .capability-list { list-style: none; }
+    .capability-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .capability-list li:last-child { border-bottom: none; }
+    .capability-list li .ci { color: var(--success); font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+
+    /* ─── Checklist ─── */
+    .checklist-section {
+      background: linear-gradient(135deg, rgba(94,234,212,.08), rgba(74,222,128,.05));
+      border: 1px solid rgba(94,234,212,.2);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .checklist-section h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .check-item {
+      display: flex;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(94,234,212,.1);
+      align-items: flex-start;
+    }
+    .check-item:last-child { border-bottom: none; }
+    .check-box {
+      width: 22px; height: 22px;
+      border: 2px solid var(--accent2);
+      border-radius: 6px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .check-item .check-text strong { display: block; color: var(--text); font-size: 0.95rem; }
+    .check-item .check-text span { color: var(--text-muted); font-size: 0.85rem; }
+
+    /* ─── Warning / Tip boxes ─── */
+    .tip-box {
+      display: flex;
+      gap: 14px;
+      padding: 16px 20px;
+      border-radius: var(--radius-sm);
+      margin: 20px 0;
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+    .tip-box.warning {
+      background: rgba(249,115,22,.1);
+      border: 1px solid rgba(249,115,22,.3);
+      color: #fbbf24;
+    }
+    .tip-box.info {
+      background: rgba(124,111,247,.1);
+      border: 1px solid rgba(124,111,247,.3);
+      color: var(--text);
+    }
+    .tip-box.success {
+      background: rgba(74,222,128,.08);
+      border: 1px solid rgba(74,222,128,.25);
+      color: var(--text);
+    }
+    .tip-box .ti { font-size: 1.3rem; flex-shrink: 0; }
+
+    /* ─── Divider ─── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 48px 0;
+    }
+
+    /* ─── Flow Diagram (CSS only) ─── */
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      padding: 24px 0;
+      flex-wrap: nowrap;
+    }
+    .flow-node {
+      flex-shrink: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      text-align: center;
+      min-width: 130px;
+    }
+    .flow-node .fn-icon { font-size: 1.6rem; }
+    .flow-node .fn-label { font-size: 0.78rem; font-weight: 700; margin-top: 6px; color: var(--text); }
+    .flow-node .fn-type { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+    .flow-node.trigger { border-color: var(--accent3); }
+    .flow-node.process { border-color: var(--accent); }
+    .flow-node.action { border-color: var(--accent2); }
+    .flow-arrow {
+      padding: 0 8px;
+      color: var(--text-muted);
+      font-size: 1.3rem;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      text-align: center;
+      padding: 40px 0 60px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    footer strong { color: var(--accent); }
+
+    /* ─── Scroll highlight ─── */
+    .anchor-target { scroll-margin-top: 24px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     SIDEBAR NAV
+════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-badge">&#127381; Claudio</div>
+    <h2>Manual del Director</h2>
+    <p>Guia n8n para no-técnicos</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Contenido</div>
+    <a href="#intro" class="active"><span class="icon">&#127757;</span> ¿Qué es n8n?</a>
+    <a href="#diccionario"><span class="icon">&#128218;</span> Diccionario del Director</a>
+    <a href="#hablar-claudio"><span class="icon">&#128172;</span> Hablar con Claudio</a>
+    <a href="#superpoderes"><span class="icon">&#9889;</span> Superpoderes MCP y Skills</a>
+    <a href="#checklist"><span class="icon">&#9989;</span> Checklist de Supervisión</a>
+  </div>
+
+  <div class="nav-section" style="margin-top:24px;">
+    <div class="nav-section-label">Referencia rápida</div>
+    <a href="#terminos-clave"><span class="icon">&#128273;</span> Términos clave</a>
+    <a href="#ejemplos-prompt"><span class="icon">&#128196;</span> Ejemplos de órdenes</a>
+    <a href="#errores"><span class="icon">&#128683;</span> Errores comunes</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     MAIN
+════════════════════════════════════════════ -->
+<main>
+
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="badge">&#127381; Manual Oficial · Claudio + n8n</div>
+    <h1>Guía para Directores<br/>de Automatización</h1>
+    <p>Todo lo que necesitas saber para darle órdenes precisas a Claudio y convertirte en un experto sin escribir una sola línea de código.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="num">1,084</div><div class="lbl">nodos disponibles</div></div>
+      <div class="stat"><div class="num">2,709</div><div class="lbl">plantillas de flujo</div></div>
+      <div class="stat"><div class="num">7</div><div class="lbl">habilidades de Claudio</div></div>
+      <div class="stat"><div class="num">0</div><div class="lbl">código que debes escribir tú</div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SECCIÓN 1 — QUÉ ES N8N
+  ════════════════════════════════════════ -->
+  <section id="intro" class="anchor-target">
+    <div class="section-header">
+      <div class="section-number">1</div>
+      <h2>¿Qué es n8n? <span>En lenguaje humano.</span></h2>
+    </div>
+
+    <div class="analogy-box">
+      <div class="label">&#128161; La Gran Analogía</div>
+      <p>Imagina que eres el <strong>director de una fábrica</strong>. La fábrica tiene una cinta transportadora (el <strong>workflow</strong>) y a lo largo de ella hay estaciones de trabajo especializadas (los <strong>nodos</strong>). Cada estación recibe algo, lo transforma o lo envía a otro lugar, y lo pasa a la siguiente. Tú no operas ninguna máquina: tú <em>diseñas</em> cómo se conectan y le dices a Claudio que las construya y las configure.</p>
+    </div>
+
+    <div class="grid-2" style="margin-top:24px;">
+      <div class="card">
+        <h3>&#128466; El Workflow (El Mapa)</h3>
+        <p>Es el <strong>plano completo</strong> de tu automatización. Define el orden en que las tareas se ejecutan, desde el primer disparador hasta la acción final. Piénsalo como la receta completa de un platillo: ingredientes, pasos, y resultado final. Puedes tener muchos workflows distintos para distintos procesos de tu empresa.</p>
+      </div>
+      <div class="card">
+        <h3>&#128268; El Nodo (La Estación)</h3>
+        <p>Es una <strong>tarea individual y especializada</strong>. Hay nodos para todo: recibir correos, consultar bases de datos, llamar a una API, transformar datos, esperar un tiempo, enviar mensajes de WhatsApp, etc. Cada nodo hace <em>una sola cosa</em> y muy bien. Se conectan entre sí para formar el workflow.</p>
+      </div>
+    </div>
+
+    <!-- Mini flujo visual -->
+    <div class="card" style="margin-top:20px;">
+      <h3>&#128198; Un Workflow típico en acción</h3>
+      <div class="flow-diagram">
+        <div class="flow-node trigger">
+          <div class="fn-icon">&#9200;</div>
+          <div class="fn-label">Cron / Schedule</div>
+          <div class="fn-type">DISPARADOR</div>
+        </div>
+        <div class="flow-arrow">&#10145;</div>
+        <div class="flow-node process">
+          <div class="fn-icon">&#128202;</div>
+          <div class="fn-label">Google Sheets</div>
+          <div class="fn-type">CONSULTA</div>
+        </div>
+        <div class="flow-arrow">&#10145;</div>
+        <div class="flow-node process">
+          <div class="fn-icon">&#129302;</div>
+          <div class="fn-label">AI / OpenAI</div>
+          <div class="fn-type">PROCESO</div>
+        </div>
+        <div class="flow-arrow">&#10145;</div>
+        <div class="flow-node action">
+          <div class="fn-icon">&#128140;</div>
+          <div class="fn-label">Gmail</div>
+          <div class="fn-type">ACCIÓN FINAL</div>
+        </div>
+      </div>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-top:8px;">Ejemplo: Cada mañana a las 9am, leer la hoja de clientes, generar un resumen con IA, y enviarlo por correo.</p>
+    </div>
+
+    <div class="tip-box info" style="margin-top:20px;">
+      <span class="ti">&#128161;</span>
+      <div><strong>Recuerda esto:</strong> n8n es como LEGO para procesos de negocio. Cada pieza (nodo) es independiente y estándar; la magia está en cómo las conectas. Claudio conoce todas las piezas disponibles y sabe cómo ensamblarlas.</div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       SECCIÓN 2 — DICCIONARIO
+  ════════════════════════════════════════ -->
+  <section id="diccionario" class="anchor-target">
+    <div class="section-header">
+      <div class="section-number">2</div>
+      <h2>El Diccionario <span>del Director</span></h2>
+    </div>
+    <p style="color:var(--text-muted); margin-bottom:28px;">Estos son los términos que Claudio te pedirá con frecuencia. No necesitas ser técnico para entenderlos; solo necesitas saber <em>qué buscar</em> en tu cuenta o plataforma.</p>
+
+    <div id="terminos-clave">
+
+      <div class="term-card">
+        <div class="term-header">
+          <span class="term-tag">Activación</span>
+          <h3>&#9889; Trigger (Disparador)</h3>
+        </div>
+        <p class="definition">Es el <strong>evento que arranca tu workflow</strong>. Sin un trigger, el flujo nunca se ejecuta. Es la primera pieza en la cadena.</p>
+        <div class="analogy"><strong>Analogía:</strong> Es como el timbre de tu puerta: alguien toca (el evento) y tú abres y actúas (el workflow se ejecuta).</div>
+        <p class="definition" style="margin-top:12px;"><strong>Ejemplos de triggers comunes:</strong></p>
+        <ul style="color:var(--text-muted); margin-top:8px; margin-left:20px; line-height:2;">
+          <li><strong>Webhook:</strong> Alguien llama a una URL especial → el workflow arranca</li>
+          <li><strong>Schedule / Cron:</strong> Se ejecuta automáticamente cada X tiempo (cada hora, cada lunes a las 8am)</li>
+          <li><strong>Email Trigger:</strong> Llega un correo → arranca el workflow</li>
+          <li><strong>Form Trigger:</strong> Alguien llena un formulario → arranca</li>
+        </ul>
+      </div>
+
+      <div class="term-card">
+        <div class="term-header">
+          <span class="term-tag">Credencial</span>
+          <h3>&#128273; API Key (Llave de Acceso)</h3>
+        </div>
+        <p class="definition">Una <strong>contraseña especial</strong> que le das a Claudio (y a n8n) para que pueda hablar con servicios externos en tu nombre. No es tu contraseña normal de usuario; es una clave técnica que genera cada plataforma.</p>
+        <div class="analogy"><strong>Analogía:</strong> Es como una tarjeta magnética de empleado. No es tu contraseña de casa; es un acceso específico para que n8n entre a, por ejemplo, tu cuenta de Gmail o tu base de datos.</div>
+        <p class="definition" style="margin-top:12px;"><strong>¿Dónde la encuentras?</strong> Generalmente en la configuración de cada servicio, bajo secciones llamadas: "API Keys", "Developer Settings", "Tokens", o "Integraciones".</p>
+      </div>
+
+      <div class="term-card">
+        <div class="term-header">
+          <span class="term-tag">Configuración</span>
+          <h3>&#127760; URL de Instancia</h3>
+        </div>
+        <p class="definition">La <strong>dirección web de tu n8n</strong>. Es como la dirección postal de tu fábrica. Puede ser una URL pública si usas n8n en la nube (ej. <code>https://tu-empresa.app.n8n.cloud</code>) o una dirección local si lo tienes en tu computadora (<code>http://localhost:5678</code>).</p>
+        <div class="analogy"><strong>¿Para qué la necesitas?</strong> Para que Claudio sepa exactamente <em>dónde</em> crear, activar o modificar tus workflows.</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-header">
+          <span class="term-tag">Datos</span>
+          <h3>&#128203; JSON (El formato de los datos)</h3>
+        </div>
+        <p class="definition">Es el <strong>idioma en que los nodos se hablan entre sí</strong>. Cuando un nodo le pasa información al siguiente, lo hace en formato JSON. No necesitas leerlo ni escribirlo, pero debes saber que existe y que cuando Claudio habla de "campos" o "propiedades" se refiere a los datos dentro de un JSON.</p>
+        <div class="analogy"><strong>Analogía:</strong> Es como una etiqueta de paquetería con campos: Nombre, Dirección, Peso, Destino. Cada nodo lee la etiqueta, hace su trabajo, y puede añadir o modificar campos antes de pasar el paquete al siguiente.</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-header">
+          <span class="term-tag">Lógica</span>
+          <h3>&#128307; IF / Switch (Toma de decisiones)</h3>
+        </div>
+        <p class="definition">Nodos especiales que permiten que tu workflow <strong>tome caminos distintos</strong> dependiendo de una condición. Como decir "si el cliente es VIP, manda correo especial; si no, manda el estándar".</p>
+        <div class="analogy"><strong>Analogía:</strong> Es el guardia de seguridad del aeropuerto: revisa tu boleto y te manda al carril de primera clase o al estándar según lo que dice.</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-header">
+          <span class="term-tag">Programación</span>
+          <h3>&#128338; Cron Expression (Programación de tiempo)</h3>
+        </div>
+        <p class="definition">Una forma técnica de decirle a n8n <strong>cuándo ejecutar</strong> un workflow automáticamente. Tú no necesitas escribirla; solo necesitas <em>describir</em> cuándo quieres que corra y Claudio la genera.</p>
+        <div class="analogy"><strong>Ejemplo de cómo pedirlo:</strong> "Claudio, quiero que esto se ejecute todos los lunes a las 9am" — Claudio escribe la expresión cron correspondiente.</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-header">
+          <span class="term-tag">Integración</span>
+          <h3>&#128101; Webhook (Receptor de llamadas)</h3>
+        </div>
+        <p class="definition">Una <strong>URL especial y única</strong> que n8n te genera. Cuando alguien (o algún sistema) la "llama" enviando datos, tu workflow se activa con esos datos. Es el trigger más poderoso y versátil.</p>
+        <div class="analogy"><strong>Analogía:</strong> Es como una línea directa de teléfono exclusiva para tu workflow. Cualquiera que marque ese número (con la información correcta) activa la línea de producción.</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-header">
+          <span class="term-tag">Expresión</span>
+          <h3>&#128221; Expression (Valor dinámico)</h3>
+        </div>
+        <p class="definition">Una mini-instrucción que le dice a un nodo: "no uses un valor fijo, usa <strong>el valor que viene del nodo anterior</strong>". Se escribe entre llaves dobles: <code>&#123;&#123; ... &#125;&#125;</code></p>
+        <div class="analogy"><strong>Ejemplo:</strong> En vez de poner "Estimado Juan" en un correo, pones <code>&#123;&#123; $json.nombre &#125;&#125;</code> y el correo automáticamente usa el nombre de cada persona de tu lista. Claudio siempre sabe cómo escribirlas.</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-header">
+          <span class="term-tag">Arquitectura</span>
+          <h3>&#128274; Credential (Credencial guardada)</h3>
+        </div>
+        <p class="definition">En n8n, las credenciales (API Keys, contraseñas de bases de datos, tokens OAuth) se <strong>guardan de forma segura y separada</strong> del workflow. Un nodo referencia una credencial por nombre, pero no guarda la clave en sí. Esto es más seguro y reutilizable.</p>
+        <div class="analogy"><strong>¿Qué debes hacer?</strong> Crear la credencial en n8n con los datos de acceso <em>antes</em> de que Claudio construya el workflow, y decirle el nombre que le pusiste.</div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-header">
+          <span class="term-tag">Proceso</span>
+          <h3>&#128257; Loop / Iterate (Repetición)</h3>
+        </div>
+        <p class="definition">Cuando tu workflow necesita hacer <strong>lo mismo con muchos elementos</strong> (ej. enviar un correo a cada cliente de una lista de 500), un Loop le dice a n8n que procese cada elemento uno a uno o en grupos.</p>
+        <div class="analogy"><strong>Analogía:</strong> Es como una cadena de montaje que produce 500 autos en serie. Cada auto pasa por los mismos pasos, pero son unidades independientes.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       SECCIÓN 3 — HABLAR CON CLAUDIO
+  ════════════════════════════════════════ -->
+  <section id="hablar-claudio" class="anchor-target">
+    <div class="section-header">
+      <div class="section-number">3</div>
+      <h2>Cómo hablar <span>con Claudio</span></h2>
+    </div>
+
+    <p style="color:var(--text-muted); margin-bottom:28px;">La clave para obtener el mejor resultado es dar órdenes que incluyan <strong>qué quieres hacer, con qué herramientas (nodos), y cuál es la condición o contexto</strong>. A continuación, plantillas de instrucción probadas.</p>
+
+    <div id="ejemplos-prompt">
+
+      <!-- Crear un workflow -->
+      <div class="card">
+        <h3>&#127381; Crear un flujo nuevo</h3>
+        <div class="prompt-block">
+          <div class="prompt-header"><span class="tag-user">Tu instrucción</span> Plantilla base</div>
+          <div class="prompt-body">
+            Claudio, <span class="highlight">crea un workflow en n8n</span> que haga lo siguiente:<br><br>
+            1. Se active <span class="highlight">cada lunes a las 8am</span> (trigger de schedule)<br>
+            2. Lea los datos de mi hoja de Google Sheets llamada <span class="highlight">"Clientes activos"</span><br>
+            3. Para cada cliente, genere un resumen personalizado usando <span class="highlight">OpenAI GPT-4</span><br>
+            4. Envíe ese resumen por <span class="highlight">Gmail</span> al correo de cada cliente<br><br>
+            Mis credenciales en n8n están guardadas como: <span class="highlight">"Google Sheets - Principal"</span> y <span class="highlight">"OpenAI - Empresa"</span>.
+          </div>
+          <div class="prompt-note">&#128161; Nota: Siempre menciona el nombre exacto de tus credenciales guardadas en n8n para que Claudio las referencie correctamente.</div>
+        </div>
+      </div>
+
+      <!-- Diagnosticar un error -->
+      <div class="card">
+        <h3>&#128683; Diagnosticar un error ("entra por arriba y sale por abajo")</h3>
+        <div class="analogy-box" style="margin-bottom:16px;">
+          <div class="label">&#128172; ¿Qué significa "entra por arriba y sale por abajo"?</div>
+          <p>En n8n, cuando un nodo tiene un <strong>error</strong>, los datos "salen" por la conexión de error (roja, abajo) en vez de continuar el flujo normal (verde, arriba). El workflow falla y se detiene en ese nodo. Así es como describírselo a Claudio.</p>
+        </div>
+        <div class="prompt-block">
+          <div class="prompt-header"><span class="tag-user">Tu instrucción</span> Reporte de error</div>
+          <div class="prompt-body">
+            Claudio, mi workflow <span class="highlight">"Resumen semanal de clientes"</span> está fallando. El nodo de <span class="highlight">Google Sheets</span> muestra error y los datos salen por la conexión roja.<br><br>
+            El mensaje de error que veo es: <span class="highlight">"[aquí pegas el mensaje de error que ves en pantalla]"</span><br><br>
+            ¿Puedes revisar la configuración de ese nodo y decirme qué está mal?
+          </div>
+          <div class="prompt-note">&#128161; Tip: Siempre copia y pega el mensaje de error exacto que aparece en rojo. Es la pista más valiosa para Claudio.</div>
+        </div>
+      </div>
+
+      <!-- Cambiar un nodo por otro -->
+      <div class="card">
+        <h3>&#128257; Cambiar un nodo por otro</h3>
+        <div class="prompt-block">
+          <div class="prompt-header"><span class="tag-user">Tu instrucción</span> Sustitución de nodo</div>
+          <div class="prompt-body">
+            Claudio, en mi workflow <span class="highlight">"Notificaciones de ventas"</span> actualmente estoy usando el nodo de <span class="highlight">Email (genérico/SMTP)</span> para enviar correos.<br><br>
+            Quiero reemplazarlo por el nodo de <span class="highlight">Gmail</span> para poder usar mi cuenta de Google directamente.<br><br>
+            Mi credencial de Gmail en n8n se llama <span class="highlight">"Gmail - Corporativo"</span>. Por favor, mantén el mismo asunto y cuerpo del correo que ya tenía el nodo anterior.
+          </div>
+          <div class="prompt-note">&#128161; Tip: Di siempre "mantén el contenido anterior" para que Claudio no pierda la lógica del correo al hacer el cambio.</div>
+        </div>
+      </div>
+
+      <!-- Agregar lógica condicional -->
+      <div class="card">
+        <h3>&#128307; Agregar una condición (bifurcación IF)</h3>
+        <div class="prompt-block">
+          <div class="prompt-header"><span class="tag-user">Tu instrucción</span> Lógica de decisión</div>
+          <div class="prompt-body">
+            Claudio, después del nodo <span class="highlight">Google Sheets</span> en mi workflow, necesito agregar una bifurcación:<br><br>
+            — Si el campo <span class="highlight">"plan"</span> del cliente es igual a <span class="highlight">"Premium"</span>, que siga a un nodo de Slack para notificar al equipo de ventas.<br>
+            — Si es cualquier otro valor, que continúe al nodo de Gmail para enviar el correo estándar.
+          </div>
+        </div>
+      </div>
+
+      <!-- Activar / desactivar -->
+      <div class="card">
+        <h3>&#9654; Activar, pausar o ejecutar manualmente</h3>
+        <div class="prompt-block">
+          <div class="prompt-header"><span class="tag-user">Tu instrucción</span> Control del workflow</div>
+          <div class="prompt-body">
+            Claudio, por favor <span class="highlight">activa el workflow</span> llamado <span class="highlight">"Reporte diario de KPIs"</span> en mi instancia de n8n. / <br><br>
+            Claudio, <span class="highlight">desactívalo temporalmente</span>, voy a modificar las credenciales.<br><br>
+            Claudio, <span class="highlight">ejecútalo una vez manualmente</span> ahora para que podamos probar si funciona con datos reales.
+          </div>
+        </div>
+      </div>
+
+      <!-- Solicitar explicación -->
+      <div class="card">
+        <h3>&#128270; Entender qué hace un workflow existente</h3>
+        <div class="prompt-block">
+          <div class="prompt-header"><span class="tag-user">Tu instrucción</span> Auditoría de workflow</div>
+          <div class="prompt-body">
+            Claudio, revisa el workflow que acabo de cargar y <span class="highlight">explícame en lenguaje simple</span>:<br>
+            — ¿Qué hace este workflow paso a paso?<br>
+            — ¿Qué nodos usa y para qué sirve cada uno?<br>
+            — ¿Qué credenciales necesita configuradas?<br>
+            — ¿Hay algo que podría fallar o mejorar?
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Fórmula de oro -->
+    <div class="checklist-section" style="margin-top:28px; background: linear-gradient(135deg, rgba(124,111,247,.1), rgba(168,85,247,.06)); border-color: rgba(124,111,247,.3);">
+      <h3 style="color:var(--accent);">&#127775; La fórmula de oro para dar órdenes</h3>
+      <div class="check-item">
+        <div class="check-box" style="border-color:var(--accent); background:rgba(124,111,247,.2);"></div>
+        <div class="check-text"><strong>Trigger</strong> <span>¿Qué inicia el workflow? (tiempo, formulario, correo, llamada HTTP)</span></div>
+      </div>
+      <div class="check-item">
+        <div class="check-box" style="border-color:var(--accent); background:rgba(124,111,247,.2);"></div>
+        <div class="check-text"><strong>Fuente de datos</strong> <span>¿De dónde vienen los datos? (Google Sheets, base de datos, API, correo)</span></div>
+      </div>
+      <div class="check-item">
+        <div class="check-box" style="border-color:var(--accent); background:rgba(124,111,247,.2);"></div>
+        <div class="check-text"><strong>Transformación</strong> <span>¿Qué le pasa a los datos en el camino? (filtrar, resumir con IA, calcular)</span></div>
+      </div>
+      <div class="check-item">
+        <div class="check-box" style="border-color:var(--accent); background:rgba(124,111,247,.2);"></div>
+        <div class="check-text"><strong>Destino final</strong> <span>¿Dónde termina? (correo, Slack, base de datos, WhatsApp, reporte)</span></div>
+      </div>
+      <div class="check-item" style="border-bottom:none;">
+        <div class="check-box" style="border-color:var(--accent); background:rgba(124,111,247,.2);"></div>
+        <div class="check-text"><strong>Credenciales</strong> <span>Nombres exactos tal como los guardaste en n8n (ej. "Gmail - Corporativo")</span></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       SECCIÓN 4 — SUPERPODERES
+  ════════════════════════════════════════ -->
+  <section id="superpoderes" class="anchor-target">
+    <div class="section-header">
+      <div class="section-number">4</div>
+      <h2>Los Superpoderes de Claudio: <span>MCP y Skills</span></h2>
+    </div>
+
+    <p style="color:var(--text-muted); margin-bottom:28px;">Claudio no trabaja solo con intuición. Tiene dos "bibliotecas de conocimiento" conectadas que lo hacen extraordinariamente capaz con n8n. Entender para qué sirven te ayuda a saber qué tan ambiciosas pueden ser tus instrucciones.</p>
+
+    <div class="grid-2">
+      <!-- MCP -->
+      <div class="power-card mcp">
+        <h3>&#128218; n8n-MCP Server</h3>
+        <div class="subtitle">"La Enciclopedia Técnica"</div>
+        <p style="color:var(--text-muted); margin-bottom:16px; font-size:0.9rem;">Una base de datos con información técnica exacta de <strong>1,084 nodos</strong> de n8n, incluyendo sus propiedades, operaciones y configuraciones.</p>
+        <ul class="capability-list">
+          <li><span class="ci">&#10003;</span> Buscar el nodo exacto que necesitas entre más de 1,000 opciones</li>
+          <li><span class="ci">&#10003;</span> Validar que la configuración del workflow sea correcta antes de ejecutarlo</li>
+          <li><span class="ci">&#10003;</span> Corregir errores automáticamente (autofix)</li>
+          <li><span class="ci">&#10003;</span> Acceder a 2,709 plantillas de workflows reales probadas</li>
+          <li><span class="ci">&#10003;</span> Saber exactamente qué parámetros requiere cada nodo</li>
+          <li><span class="ci">&#10003;</span> Desplegar workflows directamente a tu instancia de n8n</li>
+        </ul>
+        <div class="tip-box info" style="margin-top:16px;">
+          <span class="ti">&#128161;</span>
+          <div style="font-size:0.82rem;"><strong>Lo que esto significa para ti:</strong> Puedes pedirle a Claudio nodos muy específicos o poco comunes y él los encontrará sin adivinar.</div>
+        </div>
+      </div>
+
+      <!-- Skills -->
+      <div class="power-card skills">
+        <h3>&#9889; n8n Skills</h3>
+        <div class="subtitle">"El Manual de Buenas Prácticas"</div>
+        <p style="color:var(--text-muted); margin-bottom:16px; font-size:0.9rem;">7 habilidades especializadas que enseñan a Claudio cómo construir workflows de forma profesional y sin errores comunes.</p>
+        <ul class="capability-list">
+          <li><span class="ci">&#10003;</span> Usar la sintaxis correcta de expresiones <code>&#123;&#123; &#125;&#125;</code> sin errores</li>
+          <li><span class="ci">&#10003;</span> Elegir el patrón arquitectural correcto (webhook, schedule, API, IA)</li>
+          <li><span class="ci">&#10003;</span> Interpretar y corregir errores de validación automáticamente</li>
+          <li><span class="ci">&#10003;</span> Configurar nodos complejos como Agentes de IA correctamente</li>
+          <li><span class="ci">&#10003;</span> Escribir código JavaScript/Python en nodos Code sin errores</li>
+          <li><span class="ci">&#10003;</span> Evitar los errores más comunes que fallan el 62% de los workflows</li>
+        </ul>
+        <div class="tip-box success" style="margin-top:16px;">
+          <span class="ti">&#128161;</span>
+          <div style="font-size:0.82rem;"><strong>Lo que esto significa para ti:</strong> Claudio no solo construye el workflow, lo construye <em>bien</em> desde el primer intento.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Las 7 habilidades en detalle -->
+    <div class="card" style="margin-top:24px;">
+      <h3>&#128295; Las 7 Habilidades Especializadas de Claudio</h3>
+      <p style="color:var(--text-muted); margin-bottom:20px; font-size:0.9rem;">Estas habilidades se activan automáticamente según lo que necesites. No tienes que invocarlas explícitamente.</p>
+      <div class="grid-3" style="margin-top:16px;">
+        <div style="background:var(--surface2); border-radius:var(--radius-sm); padding:16px;">
+          <div style="font-size:1.4rem; margin-bottom:8px;">&#128221;</div>
+          <strong style="font-size:0.9rem;">Expresiones n8n</strong>
+          <p style="color:var(--text-muted); font-size:0.8rem; margin-top:6px;">Domina la sintaxis <code>&#123;&#123;&#125;&#125;</code> para datos dinámicos sin errores</p>
+        </div>
+        <div style="background:var(--surface2); border-radius:var(--radius-sm); padding:16px;">
+          <div style="font-size:1.4rem; margin-bottom:8px;">&#128269;</div>
+          <strong style="font-size:0.9rem;">Experto en MCP Tools</strong>
+          <p style="color:var(--text-muted); font-size:0.8rem; margin-top:6px;">Busca y valida nodos con precisión milimétrica</p>
+        </div>
+        <div style="background:var(--surface2); border-radius:var(--radius-sm); padding:16px;">
+          <div style="font-size:1.4rem; margin-bottom:8px;">&#127959;</div>
+          <strong style="font-size:0.9rem;">Patrones de Workflow</strong>
+          <p style="color:var(--text-muted); font-size:0.8rem; margin-top:6px;">5 arquitecturas probadas: webhook, API, BD, IA, schedule</p>
+        </div>
+        <div style="background:var(--surface2); border-radius:var(--radius-sm); padding:16px;">
+          <div style="font-size:1.4rem; margin-bottom:8px;">&#128683;</div>
+          <strong style="font-size:0.9rem;">Experto en Validación</strong>
+          <p style="color:var(--text-muted); font-size:0.8rem; margin-top:6px;">Interpreta errores y los corrige antes de que los veas</p>
+        </div>
+        <div style="background:var(--surface2); border-radius:var(--radius-sm); padding:16px;">
+          <div style="font-size:1.4rem; margin-bottom:8px;">&#128268;</div>
+          <strong style="font-size:0.9rem;">Configuración de Nodos</strong>
+          <p style="color:var(--text-muted); font-size:0.8rem; margin-top:6px;">Configura correctamente propiedades complejas y dependencias</p>
+        </div>
+        <div style="background:var(--surface2); border-radius:var(--radius-sm); padding:16px;">
+          <div style="font-size:1.4rem; margin-bottom:8px;">&#128187;</div>
+          <strong style="font-size:0.9rem;">Code JavaScript</strong>
+          <p style="color:var(--text-muted); font-size:0.8rem; margin-top:6px;">Escribe lógica personalizada cuando ningún nodo alcanza</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Qué puedes encargarle -->
+    <div class="card" style="margin-top:20px;">
+      <h3>&#129381; ¿Qué tareas complejas puedes encargarle a Claudio?</h3>
+      <div class="grid-2" style="margin-top:16px;">
+        <div>
+          <p style="font-weight:700; color:var(--accent2); margin-bottom:10px;">&#9989; Puedes pedirle...</p>
+          <ul style="color:var(--text-muted); line-height:2.2; font-size:0.9rem; margin-left:16px;">
+            <li>Workflows de IA con memoria conversacional</li>
+            <li>Integraciones con +1,000 servicios (Slack, HubSpot, Salesforce, etc.)</li>
+            <li>Procesar miles de registros en bucles automáticos</li>
+            <li>Manejar errores con reintentos automáticos</li>
+            <li>Workflows que se llaman entre sí (sub-workflows)</li>
+            <li>Transformaciones complejas de datos</li>
+            <li>Workflows de aprobación con espera humana</li>
+            <li>Integración con bases de datos (MySQL, PostgreSQL, MongoDB)</li>
+          </ul>
+        </div>
+        <div>
+          <p style="font-weight:700; color:var(--danger); margin-bottom:10px;">&#10060; Lo que Claudio necesita de ti...</p>
+          <ul style="color:var(--text-muted); line-height:2.2; font-size:0.9rem; margin-left:16px;">
+            <li>Las credenciales ya creadas en tu n8n</li>
+            <li>El nombre exacto de tus hojas, tablas o carpetas</li>
+            <li>La URL de tu instancia de n8n</li>
+            <li>El contexto del negocio (¿para qué es esto?)</li>
+            <li>Confirmar y activar el workflow cuando esté listo</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════
+       SECCIÓN 5 — CHECKLIST
+  ════════════════════════════════════════ -->
+  <section id="checklist" class="anchor-target">
+    <div class="section-header">
+      <div class="section-number">5</div>
+      <h2>Checklist de <span>Supervisión</span></h2>
+    </div>
+
+    <p style="color:var(--text-muted); margin-bottom:28px;">Antes de ejecutar cualquier workflow que Claudio construya, haz estas preguntas. Son las mismas que haría un ingeniero senior. No necesitas entender el código, solo <em>confirmar los hechos</em>.</p>
+
+    <!-- Bloque 1: Antes de ejecutar -->
+    <div class="checklist-section">
+      <h3>&#128214; Antes de ejecutar: Revisar el diseño</h3>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>&#9889; ¿El Trigger es correcto?</strong>
+          <span>Pregunta: "Claudio, ¿qué inicia este workflow? ¿Cuándo exactamente se activa?" Confirma que coincide con lo que necesitas.</span>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>&#128273; ¿Las credenciales son las correctas?</strong>
+          <span>Pregunta: "¿Qué credenciales usa este workflow?" Verifica que los nombres coincidan con los que tienes guardados en n8n.</span>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>&#128203; ¿Los datos fluyen en el orden correcto?</strong>
+          <span>Pregunta: "Explícame paso a paso qué información recibe y envía cada nodo." Si el orden no tiene sentido para tu proceso, corrígelo antes de ejecutar.</span>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>&#128683; ¿Hay manejo de errores?</strong>
+          <span>Pregunta: "¿Qué pasa si el nodo de Google Sheets falla? ¿El workflow lo reporta o simplemente se detiene silenciosamente?"</span>
+        </div>
+      </div>
+      <div class="check-item" style="border-bottom:none;">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>&#127760; ¿El destino final es el correcto?</strong>
+          <span>Pregunta: "¿A qué correo/canal/base de datos está enviando los resultados?" Confirma que no va a un ambiente de prueba o a la cuenta equivocada.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloque 2: Prueba controlada -->
+    <div class="checklist-section">
+      <h3>&#9654; Durante la prueba: Ejecución controlada</h3>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>&#128202; Prueba con datos reales pero seguros</strong>
+          <span>Pide a Claudio que ejecute el workflow manualmente con un solo registro antes de procesar cientos. "Claudio, ejecuta esto con solo el primer registro de la hoja."</span>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>&#128064; Verifica el resultado en el destino</strong>
+          <span>Después de la prueba, ve al lugar donde debería haber llegado el resultado (tu correo, Slack, hoja de cálculo) y confirma que está correcto.</span>
+        </div>
+      </div>
+      <div class="check-item" style="border-bottom:none;">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>&#128336; Revisa los logs de ejecución</strong>
+          <span>En n8n puedes ver la ejecución del workflow y si algún nodo falló. Pregunta a Claudio: "¿Todos los nodos terminaron en verde (sin error)?"</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloque 3: Preguntas de seguridad -->
+    <div class="checklist-section" style="background:linear-gradient(135deg,rgba(249,115,22,.08),rgba(239,68,68,.05)); border-color:rgba(249,115,22,.25);">
+      <h3 style="color:var(--accent3);">&#128274; Preguntas de seguridad que siempre debes hacer</h3>
+      <div class="check-item" style="border-color:rgba(249,115,22,.15);">
+        <div class="check-box" style="border-color:var(--accent3);"></div>
+        <div class="check-text">
+          <strong>¿Este workflow modifica o borra datos?</strong>
+          <span>Si la respuesta es sí, pide siempre una prueba en modo "solo lectura" primero o en un ambiente de prueba.</span>
+        </div>
+      </div>
+      <div class="check-item" style="border-color:rgba(249,115,22,.15);">
+        <div class="check-box" style="border-color:var(--accent3);"></div>
+        <div class="check-text">
+          <strong>¿Cuántos registros procesará en cada ejecución?</strong>
+          <span>Un workflow programado que procesa 10,000 registros por día puede tener costos de API inesperados. Confirma la escala.</span>
+        </div>
+      </div>
+      <div class="check-item" style="border-bottom:none; border-color:rgba(249,115,22,.15);">
+        <div class="check-box" style="border-color:var(--accent3);"></div>
+        <div class="check-text">
+          <strong>¿Envía correos o mensajes en producción?</strong>
+          <span>Si el workflow envía notificaciones, confirma explícitamente que durante la prueba NO envíe mensajes reales a tus clientes.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloque 4: Errores comunes -->
+    <div id="errores" class="card">
+      <h3>&#129300; Los 5 errores más comunes y cómo reportarlos</h3>
+      <div style="margin-top:16px;">
+        <div style="background:var(--surface2); border-radius:var(--radius-sm); padding:16px; margin-bottom:12px; border-left:3px solid var(--danger);">
+          <strong>1. "No se encuentra la credencial"</strong>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;">Cómo reportarlo: "Claudio, el nodo X dice que no encuentra la credencial Y. ¿Cómo la creo en n8n?"</p>
+        </div>
+        <div style="background:var(--surface2); border-radius:var(--radius-sm); padding:16px; margin-bottom:12px; border-left:3px solid var(--accent3);">
+          <strong>2. "Authentication failed" o "401 Unauthorized"</strong>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;">Cómo reportarlo: "Claudio, la API Key que configuré no funciona, el error dice 401." — Generalmente la clave expiró o es incorrecta.</p>
+        </div>
+        <div style="background:var(--surface2); border-radius:var(--radius-sm); padding:16px; margin-bottom:12px; border-left:3px solid var(--accent4);">
+          <strong>3. "Cannot read property of undefined"</strong>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;">Cómo reportarlo: "Claudio, este error aparece en el nodo de Transform/Code. ¿Qué campo está buscando que no existe?" — Un campo de datos tiene nombre diferente.</p>
+        </div>
+        <div style="background:var(--surface2); border-radius:var(--radius-sm); padding:16px; margin-bottom:12px; border-left:3px solid var(--accent);">
+          <strong>4. El workflow se activa pero no hace nada</strong>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;">Cómo reportarlo: "Claudio, el workflow se ejecutó (veo la ejecución en el historial) pero no llegó ningún correo/mensaje. ¿Qué nodo falla en silencio?"</p>
+        </div>
+        <div style="background:var(--surface2); border-radius:var(--radius-sm); padding:16px; border-left:3px solid var(--accent2);">
+          <strong>5. El workflow corre dos veces o en loop</strong>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;">Cómo reportarlo: "Claudio, el workflow se está ejecutando repetidamente o más veces de las esperadas." — Revisar el trigger y las condiciones de activación.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Manual generado por <strong>Claudio</strong> (Claude Code + n8n-MCP + n8n-Skills)</p>
+    <p style="margin-top:8px;">Tienes acceso a <strong>1,084 nodos</strong>, <strong>2,709 plantillas</strong> y <strong>7 habilidades especializadas</strong>. ¡Aprovéchalas!</p>
+    <p style="margin-top:12px; font-size:0.75rem; color:#4a5568;">Actualizado: Marzo 2026 · Para uso interno · Proyecto CLAUDIO</p>
+  </footer>
+
+</main>
+
+<!-- ─── Scroll spy (minimal JS) ─── -->
+<script>
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navLinks = document.querySelectorAll('nav a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`nav a[href="#${entry.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
