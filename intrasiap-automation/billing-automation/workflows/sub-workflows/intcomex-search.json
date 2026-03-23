@@ -1,22 +1,235 @@
 {
+  "updatedAt": "2026-03-22T19:30:05.949Z",
+  "createdAt": "2026-03-22T19:30:05.949Z",
+  "id": "ieXr8xC85ZNweLbe",
   "name": "Cotización Intrasiap — INTCOMEX Search",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
-    { "id": "intcomex-001", "name": "Trigger",      "type": "n8n-nodes-base.executeWorkflowTrigger", "typeVersion": 1, "position": [220,300], "parameters": {} },
-    { "id": "intcomex-002", "name": "Parsear Input","type": "n8n-nodes-base.code", "typeVersion": 2, "position": [440,300],
-      "parameters": { "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];" } },
     {
-      "id": "intcomex-003", "name": "Buscar en INTCOMEX", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [660,300],
+      "id": "intcomex-001",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "intcomex-002",
+      "name": "Parsear Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];"
+      }
+    },
+    {
+      "id": "intcomex-003",
+      "name": "Buscar en INTCOMEX",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ],
       "parameters": {
         "jsCode": "const productos=$('Parsear Input').first().json.productos||[];const apiKey=$vars.INTCOMEX_API_KEY;const allResults=[];\nfor(const p of productos){\n  try{\n    const resp=await $helpers.httpRequest({method:'GET',url:'https://iws.intcomex.com/api/catalog/search',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},qs:{q:p.searchQuery,country:'MX',limit:5}});\n    const items=resp.items||resp.products||resp.data||[];\n    for(const item of (Array.isArray(items)?items:[]).slice(0,3)){\n      allResults.push({mayorista:'INTCOMEX',sku:item.sku||item.partNumber||'',skuFabricante:item.vendorPartNumber||'',descripcion:item.description||item.name||'',marca:item.brand||item.vendor||p.marca,precio:Number(item.price||item.unitPrice||0),moneda:item.currency||'MXN',existencia:Number(item.quantityAvailable||item.stock||0),disponible:(item.quantityAvailable||0)>0,imagenUrl:item.imageUrl||'',productoBuscado:p.searchQuery});\n    }\n  }catch(e){allResults.push({mayorista:'INTCOMEX',error:e.message,productoBuscado:p.searchQuery});}\n}\nreturn allResults.map(r=>({json:r}));"
       }
     },
-    { "id": "intcomex-004", "name": "Normalizar Respuesta", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [880,300],
-      "parameters": { "jsCode": "const items=$input.all();return [{json:{mayorista:'INTCOMEX',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];" } }
+    {
+      "id": "intcomex-004",
+      "name": "Normalizar Respuesta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const items=$input.all();return [{json:{mayorista:'INTCOMEX',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];"
+      }
+    }
   ],
   "connections": {
-    "Trigger":           {"main":[[{"node":"Parsear Input","type":"main","index":0}]]},
-    "Parsear Input":     {"main":[[{"node":"Buscar en INTCOMEX","type":"main","index":0}]]},
-    "Buscar en INTCOMEX":{"main":[[{"node":"Normalizar Respuesta","type":"main","index":0}]]}
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parsear Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear Input": {
+      "main": [
+        [
+          {
+            "node": "Buscar en INTCOMEX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar en INTCOMEX": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "active": false, "settings": {"executionOrder":"v1"}
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "96f9bc0b-0b4a-4664-9f5a-14e2dcd82503",
+  "activeVersionId": "96f9bc0b-0b4a-4664-9f5a-14e2dcd82503",
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-22T19:30:05.950Z",
+      "createdAt": "2026-03-22T19:30:05.950Z",
+      "role": "workflow:owner",
+      "workflowId": "ieXr8xC85ZNweLbe",
+      "projectId": "Ju4z79LoIWJsd7HM",
+      "project": {
+        "updatedAt": "2026-03-22T18:11:41.056Z",
+        "createdAt": "2026-03-22T18:11:34.822Z",
+        "id": "Ju4z79LoIWJsd7HM",
+        "name": "JESUS ALFONSO MIRANDA ORTEGA <a01769572@tec.mx>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "05032258-c672-49c3-9dbc-5e6f3ca4f12d"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-22T19:30:05.986Z",
+    "createdAt": "2026-03-22T19:30:05.986Z",
+    "versionId": "96f9bc0b-0b4a-4664-9f5a-14e2dcd82503",
+    "workflowId": "ieXr8xC85ZNweLbe",
+    "nodes": [
+      {
+        "id": "intcomex-001",
+        "name": "Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          220,
+          300
+        ],
+        "parameters": {}
+      },
+      {
+        "id": "intcomex-002",
+        "name": "Parsear Input",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          440,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];"
+        }
+      },
+      {
+        "id": "intcomex-003",
+        "name": "Buscar en INTCOMEX",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          660,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const productos=$('Parsear Input').first().json.productos||[];const apiKey=$vars.INTCOMEX_API_KEY;const allResults=[];\nfor(const p of productos){\n  try{\n    const resp=await $helpers.httpRequest({method:'GET',url:'https://iws.intcomex.com/api/catalog/search',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},qs:{q:p.searchQuery,country:'MX',limit:5}});\n    const items=resp.items||resp.products||resp.data||[];\n    for(const item of (Array.isArray(items)?items:[]).slice(0,3)){\n      allResults.push({mayorista:'INTCOMEX',sku:item.sku||item.partNumber||'',skuFabricante:item.vendorPartNumber||'',descripcion:item.description||item.name||'',marca:item.brand||item.vendor||p.marca,precio:Number(item.price||item.unitPrice||0),moneda:item.currency||'MXN',existencia:Number(item.quantityAvailable||item.stock||0),disponible:(item.quantityAvailable||0)>0,imagenUrl:item.imageUrl||'',productoBuscado:p.searchQuery});\n    }\n  }catch(e){allResults.push({mayorista:'INTCOMEX',error:e.message,productoBuscado:p.searchQuery});}\n}\nreturn allResults.map(r=>({json:r}));"
+        }
+      },
+      {
+        "id": "intcomex-004",
+        "name": "Normalizar Respuesta",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          880,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const items=$input.all();return [{json:{mayorista:'INTCOMEX',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];"
+        }
+      }
+    ],
+    "connections": {
+      "Trigger": {
+        "main": [
+          [
+            {
+              "node": "Parsear Input",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parsear Input": {
+        "main": [
+          [
+            {
+              "node": "Buscar en INTCOMEX",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Buscar en INTCOMEX": {
+        "main": [
+          [
+            {
+              "node": "Normalizar Respuesta",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "JESUS ALFONSO MIRANDA ORTEGA",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-22T21:06:11.305Z",
+        "id": 5,
+        "workflowId": "ieXr8xC85ZNweLbe",
+        "versionId": "96f9bc0b-0b4a-4664-9f5a-14e2dcd82503",
+        "event": "activated",
+        "userId": "05032258-c672-49c3-9dbc-5e6f3ca4f12d"
+      }
+    ]
+  }
 }

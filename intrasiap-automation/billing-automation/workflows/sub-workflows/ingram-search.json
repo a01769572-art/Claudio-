@@ -1,72 +1,333 @@
 {
+  "updatedAt": "2026-03-23T04:29:16.868Z",
+  "createdAt": "2026-03-22T19:30:04.498Z",
+  "id": "V2TFfmk9gByqZfkG",
   "name": "Cotización Intrasiap — Ingram Search",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
-      "id": "ingram-001-trigger",
+      "id": "ing-001",
       "name": "Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [220, 300],
+      "position": [
+        220,
+        300
+      ],
       "parameters": {}
     },
     {
-      "id": "ingram-002-parse",
+      "id": "ing-002",
       "name": "Parsear Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 300],
+      "position": [
+        440,
+        300
+      ],
       "parameters": {
-        "jsCode": "const raw = $input.first().json.data || '{}';\nconst data = typeof raw === 'string' ? JSON.parse(raw) : raw;\nreturn [{ json: data }];"
+        "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];"
       }
     },
     {
-      "id": "ingram-003-token",
+      "id": "ing-003",
       "name": "Obtener Token Ingram",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [660, 300],
+      "position": [
+        660,
+        300
+      ],
       "parameters": {
         "method": "POST",
-        "url": "https://api.ingrammicro.com:443/oauth/oauth20/token",
+        "url": "https://api.ingrammicro.com:443/oauth/oauth30/token",
+        "authentication": "none",
         "sendBody": true,
         "contentType": "form-urlencoded",
         "bodyParameters": {
           "parameters": [
-            { "name": "grant_type",    "value": "client_credentials" },
-            { "name": "client_id",     "value": "={{ $vars.INGRAM_CLIENT_ID }}" },
-            { "name": "client_secret", "value": "={{ $vars.INGRAM_CLIENT_SECRET }}" }
+            {
+              "name": "grant_type",
+              "value": "client_credentials"
+            },
+            {
+              "name": "client_id",
+              "value": "HflhToYa1y4S6oTaZzuLcFDjC1KrwasS"
+            },
+            {
+              "name": "client_secret",
+              "value": "TG1IfiLa8HhRa1sQ"
+            }
           ]
         },
         "options": {}
       }
     },
     {
-      "id": "ingram-004-search",
-      "name": "Buscar Productos Ingram",
+      "id": "ing-004",
+      "name": "Buscar en Ingram",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [880, 300],
+      "position": [
+        880,
+        300
+      ],
       "parameters": {
-        "jsCode": "const token        = $('Obtener Token Ingram').first().json.access_token;\nconst productos    = $('Parsear Input').first().json.productos || [];\nconst customerNum  = $vars.INGRAM_CUSTOMER_NUMBER || '';\nconst countryCode  = $vars.INGRAM_COUNTRY_CODE || 'MX';\nconst senderId     = $vars.INGRAM_SENDER_ID || 'INTRASIAP';\nconst isSandbox    = ($vars.INGRAM_SANDBOX || 'true') === 'true';\nconst baseUrl      = isSandbox\n  ? 'https://api.ingrammicro.com:443/sandbox'\n  : 'https://api.ingrammicro.com:443';\n\nconst correlationId = 'intrasiap-' + Date.now();\nconst allResults   = [];\n\nfor (const producto of productos) {\n  try {\n    const resp = await $helpers.httpRequest({\n      method: 'GET',\n      url: `${baseUrl}/resellers/v6/catalog`,\n      headers: {\n        Authorization:        `Bearer ${token}`,\n        'IM-CustomerNumber':  customerNum,\n        'IM-CountryCode':     countryCode,\n        'IM-CorrelationID':   correlationId,\n        'IM-SenderID':        senderId,\n        'Content-Type':       'application/json'\n      },\n      qs: { keyword: producto.searchQuery, pageSize: 5 }\n    });\n\n    const items = resp.catalog || resp.products || resp.data || [];\n    for (const item of items.slice(0, 3)) {\n      allResults.push({\n        mayorista:    'Ingram Micro',\n        sku:          item.ingramPartNumber || item.vendorPartNumber || '',\n        skuFabricante: item.vendorPartNumber || '',\n        descripcion:  item.description || item.productDescription || '',\n        marca:        item.vendorName || item.brand || producto.marca,\n        precio:       Number(item.retailPrice || item.specialPrice || item.price || 0),\n        moneda:       'MXN',\n        existencia:   Number(item.quantityAvailable || item.availability?.totalAvailability || 0),\n        disponible:   (item.quantityAvailable || 0) > 0,\n        imagenUrl:    item.thumbnailUrl || item.imagePath || '',\n        productoBuscado: producto.searchQuery\n      });\n    }\n  } catch(e) {\n    allResults.push({\n      mayorista: 'Ingram Micro',\n      error: e.message,\n      productoBuscado: producto.searchQuery\n    });\n  }\n}\n\nreturn allResults.map(r => ({ json: r }));"
+        "jsCode": "const token=$('Obtener Token Ingram').first().json.access_token;\nconst productos=$('Parsear Input').first().json.productos||[];\nconst allResults=[];\nfor(const p of productos){\n  try{\n    const resp=await $helpers.httpRequest({method:'GET',url:'https://api.ingrammicro.com/reseller/v6/catalog',headers:{Authorization:'Bearer '+token,'IM-CustomerNumber':'50-661680','IM-CountryCode':'MX','IM-SenderID':'INTRASIAP','IM-CorrelationID':'intrasiap-'+Date.now(),'Accept':'application/json'},qs:{keyword:p.searchQuery,pageSize:5,pageNumber:1}});\n    const items=resp.catalog||resp.products||[];\n    for(const item of (Array.isArray(items)?items:[]).slice(0,3)){\n      allResults.push({mayorista:'Ingram Micro',sku:item.ingramPartNumber||'',skuFabricante:item.vendorPartNumber||'',descripcion:item.description||'',marca:item.vendorName||p.marca,precio:Number(item.customerPrice||item.retailPrice||0),moneda:'MXN',existencia:Number(item.quantityAvailable||0),disponible:(item.quantityAvailable||0)>0,imagenUrl:'',productoBuscado:p.searchQuery});\n    }\n  }catch(e){allResults.push({mayorista:'Ingram Micro',error:e.message,productoBuscado:p.searchQuery});}\n}\nreturn allResults.map(r=>({json:r}));"
       }
     },
     {
-      "id": "ingram-005-normalize",
+      "id": "ing-005",
       "name": "Normalizar Respuesta",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1100, 300],
+      "position": [
+        1100,
+        300
+      ],
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst resultados = items.map(i => i.json).filter(r => !r.error && r.precio > 0);\nconst errores    = items.map(i => i.json).filter(r => r.error);\n\nreturn [{\n  json: {\n    mayorista:  'Ingram Micro',\n    exitoso:    resultados.length > 0,\n    error:      errores.length > 0 ? errores[0].error : null,\n    resultados: resultados,\n    timestamp:  new Date().toISOString()\n  }\n}];"
+        "jsCode": "const items=$input.all();return [{json:{mayorista:'Ingram Micro',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];"
       }
     }
   ],
   "connections": {
-    "Trigger":                { "main": [[ { "node": "Parsear Input",          "type": "main", "index": 0 } ]] },
-    "Parsear Input":          { "main": [[ { "node": "Obtener Token Ingram",   "type": "main", "index": 0 } ]] },
-    "Obtener Token Ingram":   { "main": [[ { "node": "Buscar Productos Ingram","type": "main", "index": 0 } ]] },
-    "Buscar Productos Ingram":{ "main": [[ { "node": "Normalizar Respuesta",   "type": "main", "index": 0 } ]] }
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parsear Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear Input": {
+      "main": [
+        [
+          {
+            "node": "Obtener Token Ingram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Token Ingram": {
+      "main": [
+        [
+          {
+            "node": "Buscar en Ingram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar en Ingram": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "active": false,
-  "settings": { "executionOrder": "v1" }
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "a806fefc-a20f-43de-bf29-1cf47998313d",
+  "activeVersionId": "a806fefc-a20f-43de-bf29-1cf47998313d",
+  "versionCounter": 8,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-22T19:30:04.502Z",
+      "createdAt": "2026-03-22T19:30:04.502Z",
+      "role": "workflow:owner",
+      "workflowId": "V2TFfmk9gByqZfkG",
+      "projectId": "Ju4z79LoIWJsd7HM",
+      "project": {
+        "updatedAt": "2026-03-22T18:11:41.056Z",
+        "createdAt": "2026-03-22T18:11:34.822Z",
+        "id": "Ju4z79LoIWJsd7HM",
+        "name": "JESUS ALFONSO MIRANDA ORTEGA <a01769572@tec.mx>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "05032258-c672-49c3-9dbc-5e6f3ca4f12d"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-23T04:29:16.869Z",
+    "createdAt": "2026-03-23T04:29:16.869Z",
+    "versionId": "a806fefc-a20f-43de-bf29-1cf47998313d",
+    "workflowId": "V2TFfmk9gByqZfkG",
+    "nodes": [
+      {
+        "id": "ing-001",
+        "name": "Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          220,
+          300
+        ],
+        "parameters": {}
+      },
+      {
+        "id": "ing-002",
+        "name": "Parsear Input",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          440,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];"
+        }
+      },
+      {
+        "id": "ing-003",
+        "name": "Obtener Token Ingram",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          660,
+          300
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.ingrammicro.com:443/oauth/oauth30/token",
+          "authentication": "none",
+          "sendBody": true,
+          "contentType": "form-urlencoded",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "grant_type",
+                "value": "client_credentials"
+              },
+              {
+                "name": "client_id",
+                "value": "HflhToYa1y4S6oTaZzuLcFDjC1KrwasS"
+              },
+              {
+                "name": "client_secret",
+                "value": "TG1IfiLa8HhRa1sQ"
+              }
+            ]
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "ing-004",
+        "name": "Buscar en Ingram",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          880,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const token=$('Obtener Token Ingram').first().json.access_token;\nconst productos=$('Parsear Input').first().json.productos||[];\nconst allResults=[];\nfor(const p of productos){\n  try{\n    const resp=await $helpers.httpRequest({method:'GET',url:'https://api.ingrammicro.com/reseller/v6/catalog',headers:{Authorization:'Bearer '+token,'IM-CustomerNumber':'50-661680','IM-CountryCode':'MX','IM-SenderID':'INTRASIAP','IM-CorrelationID':'intrasiap-'+Date.now(),'Accept':'application/json'},qs:{keyword:p.searchQuery,pageSize:5,pageNumber:1}});\n    const items=resp.catalog||resp.products||[];\n    for(const item of (Array.isArray(items)?items:[]).slice(0,3)){\n      allResults.push({mayorista:'Ingram Micro',sku:item.ingramPartNumber||'',skuFabricante:item.vendorPartNumber||'',descripcion:item.description||'',marca:item.vendorName||p.marca,precio:Number(item.customerPrice||item.retailPrice||0),moneda:'MXN',existencia:Number(item.quantityAvailable||0),disponible:(item.quantityAvailable||0)>0,imagenUrl:'',productoBuscado:p.searchQuery});\n    }\n  }catch(e){allResults.push({mayorista:'Ingram Micro',error:e.message,productoBuscado:p.searchQuery});}\n}\nreturn allResults.map(r=>({json:r}));"
+        }
+      },
+      {
+        "id": "ing-005",
+        "name": "Normalizar Respuesta",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1100,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const items=$input.all();return [{json:{mayorista:'Ingram Micro',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];"
+        }
+      }
+    ],
+    "connections": {
+      "Trigger": {
+        "main": [
+          [
+            {
+              "node": "Parsear Input",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parsear Input": {
+        "main": [
+          [
+            {
+              "node": "Obtener Token Ingram",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Obtener Token Ingram": {
+        "main": [
+          [
+            {
+              "node": "Buscar en Ingram",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Buscar en Ingram": {
+        "main": [
+          [
+            {
+              "node": "Normalizar Respuesta",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "JESUS ALFONSO MIRANDA ORTEGA",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-23T04:29:17.046Z",
+        "id": 13,
+        "workflowId": "V2TFfmk9gByqZfkG",
+        "versionId": "a806fefc-a20f-43de-bf29-1cf47998313d",
+        "event": "activated",
+        "userId": "05032258-c672-49c3-9dbc-5e6f3ca4f12d"
+      },
+      {
+        "createdAt": "2026-03-23T04:29:16.962Z",
+        "id": 12,
+        "workflowId": "V2TFfmk9gByqZfkG",
+        "versionId": "a806fefc-a20f-43de-bf29-1cf47998313d",
+        "event": "deactivated",
+        "userId": "05032258-c672-49c3-9dbc-5e6f3ca4f12d"
+      }
+    ]
+  }
 }

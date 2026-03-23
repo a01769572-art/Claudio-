@@ -1,22 +1,235 @@
 {
+  "updatedAt": "2026-03-22T19:30:05.407Z",
+  "createdAt": "2026-03-22T19:30:05.407Z",
+  "id": "iZCyDOD2sFXI8GFW",
   "name": "Cotización Intrasiap — CT Search",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
-    { "id": "ct-001", "name": "Trigger",      "type": "n8n-nodes-base.executeWorkflowTrigger", "typeVersion": 1, "position": [220,300], "parameters": {} },
-    { "id": "ct-002", "name": "Parsear Input","type": "n8n-nodes-base.code", "typeVersion": 2, "position": [440,300],
-      "parameters": { "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];" } },
     {
-      "id": "ct-003", "name": "Buscar en CT", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [660,300],
+      "id": "ct-001",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "ct-002",
+      "name": "Parsear Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];"
+      }
+    },
+    {
+      "id": "ct-003",
+      "name": "Buscar en CT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ],
       "parameters": {
         "jsCode": "const productos=$('Parsear Input').first().json.productos||[];const token=$vars.CT_TOKEN;const allResults=[];\nfor(const p of productos){\n  try{\n    const resp=await $helpers.httpRequest({method:'GET',url:'https://api.ctonline.mx/catalogo',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},qs:{q:p.searchQuery,limit:5}});\n    const items=resp.productos||resp.data||[];\n    for(const item of (Array.isArray(items)?items:[]).slice(0,3)){\n      allResults.push({mayorista:'CT Internacional',sku:item.clave||item.id||'',skuFabricante:item.numero_parte||'',descripcion:item.nombre||item.descripcion||'',marca:item.marca||p.marca,precio:Number(item.precio||0),moneda:'MXN',existencia:Number(item.existencia||0),disponible:(item.existencia||0)>0,imagenUrl:item.imagen||'',productoBuscado:p.searchQuery});\n    }\n  }catch(e){allResults.push({mayorista:'CT Internacional',error:e.message,productoBuscado:p.searchQuery});}\n}\nreturn allResults.map(r=>({json:r}));"
       }
     },
-    { "id": "ct-004", "name": "Normalizar Respuesta", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [880,300],
-      "parameters": { "jsCode": "const items=$input.all();return [{json:{mayorista:'CT Internacional',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];" } }
+    {
+      "id": "ct-004",
+      "name": "Normalizar Respuesta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const items=$input.all();return [{json:{mayorista:'CT Internacional',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];"
+      }
+    }
   ],
   "connections": {
-    "Trigger":      {"main":[[{"node":"Parsear Input","type":"main","index":0}]]},
-    "Parsear Input":{"main":[[{"node":"Buscar en CT","type":"main","index":0}]]},
-    "Buscar en CT": {"main":[[{"node":"Normalizar Respuesta","type":"main","index":0}]]}
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parsear Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear Input": {
+      "main": [
+        [
+          {
+            "node": "Buscar en CT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar en CT": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "active": false, "settings": {"executionOrder":"v1"}
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "43b3a2bf-7490-404c-bb00-2b76512a2220",
+  "activeVersionId": "43b3a2bf-7490-404c-bb00-2b76512a2220",
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-22T19:30:05.409Z",
+      "createdAt": "2026-03-22T19:30:05.409Z",
+      "role": "workflow:owner",
+      "workflowId": "iZCyDOD2sFXI8GFW",
+      "projectId": "Ju4z79LoIWJsd7HM",
+      "project": {
+        "updatedAt": "2026-03-22T18:11:41.056Z",
+        "createdAt": "2026-03-22T18:11:34.822Z",
+        "id": "Ju4z79LoIWJsd7HM",
+        "name": "JESUS ALFONSO MIRANDA ORTEGA <a01769572@tec.mx>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "05032258-c672-49c3-9dbc-5e6f3ca4f12d"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-22T19:30:05.454Z",
+    "createdAt": "2026-03-22T19:30:05.454Z",
+    "versionId": "43b3a2bf-7490-404c-bb00-2b76512a2220",
+    "workflowId": "iZCyDOD2sFXI8GFW",
+    "nodes": [
+      {
+        "id": "ct-001",
+        "name": "Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          220,
+          300
+        ],
+        "parameters": {}
+      },
+      {
+        "id": "ct-002",
+        "name": "Parsear Input",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          440,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];"
+        }
+      },
+      {
+        "id": "ct-003",
+        "name": "Buscar en CT",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          660,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const productos=$('Parsear Input').first().json.productos||[];const token=$vars.CT_TOKEN;const allResults=[];\nfor(const p of productos){\n  try{\n    const resp=await $helpers.httpRequest({method:'GET',url:'https://api.ctonline.mx/catalogo',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},qs:{q:p.searchQuery,limit:5}});\n    const items=resp.productos||resp.data||[];\n    for(const item of (Array.isArray(items)?items:[]).slice(0,3)){\n      allResults.push({mayorista:'CT Internacional',sku:item.clave||item.id||'',skuFabricante:item.numero_parte||'',descripcion:item.nombre||item.descripcion||'',marca:item.marca||p.marca,precio:Number(item.precio||0),moneda:'MXN',existencia:Number(item.existencia||0),disponible:(item.existencia||0)>0,imagenUrl:item.imagen||'',productoBuscado:p.searchQuery});\n    }\n  }catch(e){allResults.push({mayorista:'CT Internacional',error:e.message,productoBuscado:p.searchQuery});}\n}\nreturn allResults.map(r=>({json:r}));"
+        }
+      },
+      {
+        "id": "ct-004",
+        "name": "Normalizar Respuesta",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          880,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const items=$input.all();return [{json:{mayorista:'CT Internacional',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];"
+        }
+      }
+    ],
+    "connections": {
+      "Trigger": {
+        "main": [
+          [
+            {
+              "node": "Parsear Input",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parsear Input": {
+        "main": [
+          [
+            {
+              "node": "Buscar en CT",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Buscar en CT": {
+        "main": [
+          [
+            {
+              "node": "Normalizar Respuesta",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "JESUS ALFONSO MIRANDA ORTEGA",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-22T21:06:10.975Z",
+        "id": 4,
+        "workflowId": "iZCyDOD2sFXI8GFW",
+        "versionId": "43b3a2bf-7490-404c-bb00-2b76512a2220",
+        "event": "activated",
+        "userId": "05032258-c672-49c3-9dbc-5e6f3ca4f12d"
+      }
+    ]
+  }
 }

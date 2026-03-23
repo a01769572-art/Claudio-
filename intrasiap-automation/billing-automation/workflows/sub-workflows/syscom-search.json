@@ -1,72 +1,333 @@
 {
+  "updatedAt": "2026-03-23T04:33:29.660Z",
+  "createdAt": "2026-03-22T19:30:05.129Z",
+  "id": "Xc34eTbT9ygqNb9O",
   "name": "Cotización Intrasiap — SYSCOM Search",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
-      "id": "syscom-001-trigger",
+      "id": "sys-001",
       "name": "Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
-      "position": [220, 300],
+      "position": [
+        220,
+        300
+      ],
       "parameters": {}
     },
     {
-      "id": "syscom-002-parse",
+      "id": "sys-002",
       "name": "Parsear Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 300],
+      "position": [
+        440,
+        300
+      ],
       "parameters": {
-        "jsCode": "const raw = $input.first().json.data || '{}';\nconst data = typeof raw === 'string' ? JSON.parse(raw) : raw;\nreturn [{ json: data }];"
+        "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];"
       }
     },
     {
-      "id": "syscom-003-token",
+      "id": "sys-003",
       "name": "Obtener Token SYSCOM",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [660, 300],
+      "position": [
+        660,
+        300
+      ],
       "parameters": {
         "method": "POST",
         "url": "https://developers.syscom.mx/oauth/token",
+        "authentication": "none",
         "sendBody": true,
         "contentType": "form-urlencoded",
         "bodyParameters": {
           "parameters": [
-            { "name": "grant_type",    "value": "client_credentials" },
-            { "name": "client_id",     "value": "={{ $vars.SYSCOM_CLIENT_ID }}" },
-            { "name": "client_secret", "value": "={{ $vars.SYSCOM_CLIENT_SECRET }}" }
+            {
+              "name": "grant_type",
+              "value": "client_credentials"
+            },
+            {
+              "name": "client_id",
+              "value": "piqARg3UC0yudMTyeSTNq4WtY6WX6gYe"
+            },
+            {
+              "name": "client_secret",
+              "value": "fChpVKkzRYGZWPcpRw8TzqhM4mQZAUm6N00D3uNZ"
+            }
           ]
         },
         "options": {}
       }
     },
     {
-      "id": "syscom-004-search",
+      "id": "sys-004",
       "name": "Buscar en SYSCOM",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [880, 300],
+      "position": [
+        880,
+        300
+      ],
       "parameters": {
-        "jsCode": "const token     = $('Obtener Token SYSCOM').first().json.access_token;\nconst productos = $('Parsear Input').first().json.productos || [];\nconst allResults = [];\n\nfor (const producto of productos) {\n  try {\n    const resp = await $helpers.httpRequest({\n      method: 'GET',\n      url: 'https://developers.syscom.mx/api/v1/productos',\n      headers: { Authorization: `Bearer ${token}` },\n      qs: { keyword: producto.searchQuery, limite: 5 }\n    });\n\n    const items = resp.productos || resp.data || resp || [];\n    const list  = Array.isArray(items) ? items : [];\n\n    for (const item of list.slice(0, 3)) {\n      allResults.push({\n        mayorista:       'SYSCOM',\n        sku:             item.producto_id || item.codigo || '',\n        skuFabricante:   item.numero_parte || '',\n        descripcion:     item.titulo || item.descripcion || '',\n        marca:           item.marca || producto.marca,\n        precio:          Number(item.precios?.precio_lista || item.precio || 0),\n        moneda:          'MXN',\n        existencia:      Number(item.total_existencia || item.existencia || 0),\n        disponible:      (item.total_existencia || 0) > 0,\n        imagenUrl:       item.img_portada || '',\n        productoBuscado: producto.searchQuery\n      });\n    }\n  } catch(e) {\n    allResults.push({ mayorista: 'SYSCOM', error: e.message, productoBuscado: producto.searchQuery });\n  }\n}\n\nreturn allResults.map(r => ({ json: r }));"
+        "jsCode": "const token=$('Obtener Token SYSCOM').first().json.access_token;\nconst productos=$('Parsear Input').first().json.productos||[];\nconst allResults=[];\nfor(const p of productos){\n  try{\n    const resp=await $helpers.httpRequest({method:'GET',url:'https://developers.syscom.mx/api/v1/productos',headers:{Authorization:'Bearer '+token},qs:{keyword:p.searchQuery,limite:5}});\n    const items=resp.productos||resp.data||resp||[];\n    for(const item of (Array.isArray(items)?items:[]).slice(0,3)){\n      allResults.push({mayorista:'SYSCOM',sku:item.producto_id||item.codigo||'',skuFabricante:item.numero_parte||'',descripcion:item.titulo||item.descripcion||'',marca:item.marca||p.marca,precio:Number(item.precios?.precio_lista||item.precio||0),moneda:'MXN',existencia:Number(item.total_existencia||0),disponible:(item.total_existencia||0)>0,imagenUrl:item.img_portada||'',productoBuscado:p.searchQuery});\n    }\n  }catch(e){allResults.push({mayorista:'SYSCOM',error:e.message,productoBuscado:p.searchQuery});}\n}\nreturn allResults.map(r=>({json:r}));"
       }
     },
     {
-      "id": "syscom-005-normalize",
+      "id": "sys-005",
       "name": "Normalizar Respuesta",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1100, 300],
+      "position": [
+        1100,
+        300
+      ],
       "parameters": {
-        "jsCode": "const items = $input.all();\nreturn [{ json: { mayorista: 'SYSCOM', exitoso: true, resultados: items.map(i=>i.json).filter(r=>!r.error && r.precio>0), timestamp: new Date().toISOString() } }];"
+        "jsCode": "const items=$input.all();return [{json:{mayorista:'SYSCOM',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];"
       }
     }
   ],
   "connections": {
-    "Trigger":              { "main": [[ { "node": "Parsear Input",         "type": "main", "index": 0 } ]] },
-    "Parsear Input":        { "main": [[ { "node": "Obtener Token SYSCOM",  "type": "main", "index": 0 } ]] },
-    "Obtener Token SYSCOM": { "main": [[ { "node": "Buscar en SYSCOM",      "type": "main", "index": 0 } ]] },
-    "Buscar en SYSCOM":     { "main": [[ { "node": "Normalizar Respuesta",  "type": "main", "index": 0 } ]] }
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parsear Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear Input": {
+      "main": [
+        [
+          {
+            "node": "Obtener Token SYSCOM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Token SYSCOM": {
+      "main": [
+        [
+          {
+            "node": "Buscar en SYSCOM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar en SYSCOM": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "active": false,
-  "settings": { "executionOrder": "v1" }
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "dc4ebd7a-0707-4616-8e8c-2b4088bff241",
+  "activeVersionId": "dc4ebd7a-0707-4616-8e8c-2b4088bff241",
+  "versionCounter": 8,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-22T19:30:05.130Z",
+      "createdAt": "2026-03-22T19:30:05.130Z",
+      "role": "workflow:owner",
+      "workflowId": "Xc34eTbT9ygqNb9O",
+      "projectId": "Ju4z79LoIWJsd7HM",
+      "project": {
+        "updatedAt": "2026-03-22T18:11:41.056Z",
+        "createdAt": "2026-03-22T18:11:34.822Z",
+        "id": "Ju4z79LoIWJsd7HM",
+        "name": "JESUS ALFONSO MIRANDA ORTEGA <a01769572@tec.mx>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "05032258-c672-49c3-9dbc-5e6f3ca4f12d"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-23T04:33:29.660Z",
+    "createdAt": "2026-03-23T04:33:29.660Z",
+    "versionId": "dc4ebd7a-0707-4616-8e8c-2b4088bff241",
+    "workflowId": "Xc34eTbT9ygqNb9O",
+    "nodes": [
+      {
+        "id": "sys-001",
+        "name": "Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          220,
+          300
+        ],
+        "parameters": {}
+      },
+      {
+        "id": "sys-002",
+        "name": "Parsear Input",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          440,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const raw=$input.first().json.data||'{}';const data=typeof raw==='string'?JSON.parse(raw):raw;return [{json:data}];"
+        }
+      },
+      {
+        "id": "sys-003",
+        "name": "Obtener Token SYSCOM",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          660,
+          300
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://developers.syscom.mx/oauth/token",
+          "authentication": "none",
+          "sendBody": true,
+          "contentType": "form-urlencoded",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "grant_type",
+                "value": "client_credentials"
+              },
+              {
+                "name": "client_id",
+                "value": "piqARg3UC0yudMTyeSTNq4WtY6WX6gYe"
+              },
+              {
+                "name": "client_secret",
+                "value": "fChpVKkzRYGZWPcpRw8TzqhM4mQZAUm6N00D3uNZ"
+              }
+            ]
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "sys-004",
+        "name": "Buscar en SYSCOM",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          880,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const token=$('Obtener Token SYSCOM').first().json.access_token;\nconst productos=$('Parsear Input').first().json.productos||[];\nconst allResults=[];\nfor(const p of productos){\n  try{\n    const resp=await $helpers.httpRequest({method:'GET',url:'https://developers.syscom.mx/api/v1/productos',headers:{Authorization:'Bearer '+token},qs:{keyword:p.searchQuery,limite:5}});\n    const items=resp.productos||resp.data||resp||[];\n    for(const item of (Array.isArray(items)?items:[]).slice(0,3)){\n      allResults.push({mayorista:'SYSCOM',sku:item.producto_id||item.codigo||'',skuFabricante:item.numero_parte||'',descripcion:item.titulo||item.descripcion||'',marca:item.marca||p.marca,precio:Number(item.precios?.precio_lista||item.precio||0),moneda:'MXN',existencia:Number(item.total_existencia||0),disponible:(item.total_existencia||0)>0,imagenUrl:item.img_portada||'',productoBuscado:p.searchQuery});\n    }\n  }catch(e){allResults.push({mayorista:'SYSCOM',error:e.message,productoBuscado:p.searchQuery});}\n}\nreturn allResults.map(r=>({json:r}));"
+        }
+      },
+      {
+        "id": "sys-005",
+        "name": "Normalizar Respuesta",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1100,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const items=$input.all();return [{json:{mayorista:'SYSCOM',exitoso:true,resultados:items.map(i=>i.json).filter(r=>!r.error&&r.precio>0),timestamp:new Date().toISOString()}}];"
+        }
+      }
+    ],
+    "connections": {
+      "Trigger": {
+        "main": [
+          [
+            {
+              "node": "Parsear Input",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parsear Input": {
+        "main": [
+          [
+            {
+              "node": "Obtener Token SYSCOM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Obtener Token SYSCOM": {
+        "main": [
+          [
+            {
+              "node": "Buscar en SYSCOM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Buscar en SYSCOM": {
+        "main": [
+          [
+            {
+              "node": "Normalizar Respuesta",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "JESUS ALFONSO MIRANDA ORTEGA",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-23T04:33:29.885Z",
+        "id": 15,
+        "workflowId": "Xc34eTbT9ygqNb9O",
+        "versionId": "dc4ebd7a-0707-4616-8e8c-2b4088bff241",
+        "event": "activated",
+        "userId": "05032258-c672-49c3-9dbc-5e6f3ca4f12d"
+      },
+      {
+        "createdAt": "2026-03-23T04:33:29.777Z",
+        "id": 14,
+        "workflowId": "Xc34eTbT9ygqNb9O",
+        "versionId": "dc4ebd7a-0707-4616-8e8c-2b4088bff241",
+        "event": "deactivated",
+        "userId": "05032258-c672-49c3-9dbc-5e6f3ca4f12d"
+      }
+    ]
+  }
 }
